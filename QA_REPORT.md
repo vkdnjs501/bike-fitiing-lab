@@ -1,40 +1,31 @@
-# Bike Fitting Lab — Beta 1.6.2 QA Report
+# Bike Fitting Lab Beta 1.6.3 — QA Report
 
-## Runtime test environment
-- Chromium 144 headless runtime via Chrome DevTools Protocol
-- Desktop logic regression + 390 px mobile viewport test
+## Scope
+Professional analog measurement classification and collapsible Usage Error UX.
 
-## Quick Fitting tests
-Using height 175 cm, inseam 80.0 cm, MINI VELO, Analog Measurement ON and Quick Fitting ON:
-- COMMUTE => **703 mm**
-- ENDURANCE => **706 mm**
-- SPORT => **709 mm**
-- BB floor/current saddle/crank inputs => disabled
-- QUICK MEASUREMENT badge => visible
-- USAGE ERROR => READY after valid inputs
+## Runtime checks
+- Analog ON + Quick OFF + Height 175 cm + Inseam 80.0 cm + MINI VELO + BB 281 mm + Current 700 mm + Crank 170 mm
+  - Result state: `PRO FIT` — PASS
+  - `PRO MEASUREMENT` visible — PASS
+  - `QUICK MEASUREMENT` hidden — PASS
+  - Target: `706 mm` — PASS
+  - Professional result line: `전문가 측정값: 706 mm` — PASS
+- Quick Fitting ON with same rider inputs
+  - Result state: `QUICK FIT` — PASS
+  - Quick badge visible / Pro badge hidden — PASS
+  - COMMUTE quick target: `703 mm` — PASS
+- Missing required analog height + Calculate
+  - Result state: `USAGE ERROR` — PASS
+  - Usage Error panel automatically expands — PASS
+  - Missing height reason shown — PASS
 
-## Usage Error test
-With Analog Measurement active and height cleared:
-- Live Usage Error => `신장`
-- Reason => analog mode requires a 100–230 cm direct height input
-- Result state => `USAGE ERROR`
+## UI checks
+- Usage Error details panel is collapsed by default — PASS
+- Mobile viewport 390 px: document scroll width = 390 px — PASS
+- Horizontal overflow — NONE
 
-## Full fitting regression
-Analog OFF / Quick OFF / inseam 80.0 cm / current 690 mm / BB 281 mm / crank 170 mm:
-- Target => **706 mm**
-- Current => **690 mm**
-- Change => **+16 mm**
-- Floor reference => **987 mm**
-
-## Mobile UX
-390 px viewport:
-- Horizontal overflow => **0**
-- Rider Check => collapsed by default
-- Quick badge => visible in Quick workflow
-- Runtime exceptions / console errors => **0**
-
-## Static validation
-- app.js syntax: PASS
-- service-worker.js syntax: PASS
-- manifest JSON parse: PASS
-- DOM ID uniqueness/reference checks: PASS
+## Static checks
+- JavaScript syntax (`node --check`) — PASS
+- Missing JS-referenced DOM IDs — 0
+- Duplicate DOM IDs — 0
+- Service Worker cache version updated to `v1.6.3-pro1`
