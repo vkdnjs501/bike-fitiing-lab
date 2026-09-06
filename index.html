@@ -12,8 +12,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 아날로그 측정·간이피팅·카메라/갤러리 3점 측정·정비사 대시보드.">
-  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.0</title>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.1</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=1.6.1">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=1.6.1">
 </head>
 <body>
   <div class="wrap">
@@ -34,7 +34,7 @@
         <h1>안장 높이 피팅기</h1>
         <p>Field fitting · Analog / Photo · Quick Measurement · Current → Target → Change</p>
       </div>
-      <div class="badge" aria-label="Beta version">BETA 1.6.0</div>
+      <div class="badge" aria-label="Beta version">BETA 1.6.1</div>
     </header>
 
     <nav class="flowbar" aria-label="피팅 순서">
@@ -124,7 +124,7 @@
             <label class="mode-switch" for="quickFitMode">
               <input id="quickFitMode" type="checkbox">
               <span class="switch-ui" aria-hidden="true"></span>
-              <span class="switch-copy"><b>간이피팅</b><small>BB / 현재 안장 생략</small></span>
+              <span class="switch-copy"><b>간이피팅</b><small>BB / 현재 안장 / 크랭크 생략</small></span>
             </label>
           </div>
           <div class="choice-grid" id="bikeChoices">
@@ -144,7 +144,7 @@
               <label for="currentSaddle">현재 안장 · mm <span>BB→안장</span></label>
               <input id="currentSaddle" type="number" inputmode="decimal" min="450" max="1000" step="1" placeholder="예: 700">
             </div>
-            <div class="field">
+            <div class="field" id="crankField" data-quick-skip>
               <label for="crankLength">크랭크 · mm <span>선택</span></label>
               <input id="crankLength" type="number" inputmode="decimal" min="140" max="190" step="2.5" placeholder="예: 170">
             </div>
@@ -277,13 +277,13 @@
     </main>
 
     <footer class="footer">
-      <div>BETA 1.6.0 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
-      <div>Quick mode skips BB floor/current saddle inputs · Calculation base: LeMond 0.883 · optional crank-length correction</div>
+      <div>BETA 1.6.1 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
+      <div>Quick mode skips BB floor/current saddle/crank inputs · Calculation base: LeMond 0.883</div>
     </footer>
   </div>
 
   <canvas id="sourceCanvas" class="visually-hidden"></canvas>
   <canvas id="exportCanvas" class="visually-hidden"></canvas>
-  <script src="./app.js"></script>
+  <script src="./app.js?v=1.6.1"></script>
 </body>
 </html>
