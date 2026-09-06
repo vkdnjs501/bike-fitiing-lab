@@ -4,14 +4,17 @@
   const $ = (id) => document.getElementById(id);
   const dom = {
     height: $('heightCm'), manualInseam: $('manualInseam'), bb: $('bbHeight'), current: $('currentSaddle'), crank: $('crankLength'),
+    analogMode: $('analogMode'), quickFitMode: $('quickFitMode'), photoSection: $('photoSection'), bbField: $('bbField'), currentField: $('currentField'),
     bikeChoices: $('bikeChoices'), purposeChoices: $('purposeChoices'), symptomGrid: $('symptomGrid'),
     video: $('video'), photoCanvas: $('photoCanvas'), sourceCanvas: $('sourceCanvas'), exportCanvas: $('exportCanvas'),
     cameraStage: $('cameraStage'), stageBadge: $('stageBadge'), measureStatus: $('measureStatus'), qualityPill: $('qualityPill'), qualityText: $('qualityText'),
     galleryInput: $('galleryInput'), btnStartCamera: $('btnStartCamera'), btnGallery: $('btnGallery'), btnSwitchCamera: $('btnSwitchCamera'), btnCapture: $('btnCapture'), btnRetake: $('btnRetake'), btnUndoPoint: $('btnUndoPoint'), btnCalculate: $('btnCalculate'), btnSavePhoto: $('btnSavePhoto'), saveHint: $('saveHint'),
+    installTip: $('installTip'), btnDismissInstallTip: $('btnDismissInstallTip'),
     resultBikeLine: $('resultBikeLine'), resultMeta: $('resultMeta'), resultState: $('resultState'), targetSaddle: $('targetSaddle'), targetRange: $('targetRange'),
     heroCurrent: $('heroCurrent'), heroTarget: $('heroTarget'), heroChange: $('heroChange'), fitGauge: $('fitGauge'), gaugeCurrent: $('gaugeCurrent'), gaugeCaption: $('gaugeCaption'),
     metricInseam: $('metricInseam'), metricSource: $('metricSource'), metricCrank: $('metricCrank'), metricFloor: $('metricFloor'),
-    verdictBadge: $('verdictBadge'), verdictText: $('verdictText'), adjustPlan: $('adjustPlan'), fitAnalysis: $('fitAnalysis'), symptomAnalysis: $('symptomAnalysis'), fieldGuide: $('fieldGuide')
+    verdictBadge: $('verdictBadge'), verdictText: $('verdictText'), adjustPlan: $('adjustPlan'), fitAnalysis: $('fitAnalysis'), symptomAnalysis: $('symptomAnalysis'), fieldGuide: $('fieldGuide'),
+    quickBadge: $('quickBadge'), quickResultLine: $('quickResultLine'), resultShell: document.querySelector('.result-shell')
   };
 
   const pctx = dom.photoCanvas.getContext('2d');
@@ -35,8 +38,8 @@
   const BASE_COEFF = 0.883;
   const CRANK_REFERENCE = 170;
   const RANGE_MM = 5;
-  const STORE_KEY = 'bfl_1_5_settings';
-  const LEGACY_KEY = 'bfl_1_1_settings';
+  const STORE_KEY = 'bfl_1_6_settings';
+  const LEGACY_KEY = 'bfl_1_5_settings';
 
   const state = {
     stream: null,
@@ -49,7 +52,9 @@
     photoInseam: null,
     result: null,
     sourceName: null,
-    recalcFrame: 0
+    recalcFrame: 0,
+    analogMode: false,
+    quickFit: false
   };
 
   const num = (el) => {
@@ -60,6 +65,40 @@
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   const round = (value) => Math.round(value);
   const signed = (value) => `${value >= 0 ? '+' : ''}${round(value)}`;
+  const IOS_INSTALL_DISMISS_KEY = 'bfl_ios_install_tip_dismissed';
+
+  function isIOSDevice() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function isIOSSafari() {
+    const ua = navigator.userAgent;
+    return isIOSDevice() && /Safari/i.test(ua) && !/(CriOS|FxiOS|EdgiOS|OPiOS)/i.test(ua);
+  }
+
+  function isStandaloneMode() {
+    return window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+  }
+
+  function syncIOSAppMode() {
+    const standalone = isStandaloneMode();
+    document.documentElement.classList.toggle('standalone', standalone);
+    if (!dom.installTip) return;
+    let dismissed = false;
+    try { dismissed = localStorage.getItem(IOS_INSTALL_DISMISS_KEY) === '1'; } catch (_) {}
+    dom.installTip.hidden = !(isIOSSafari() && !standalone && !dismissed);
+  }
+
+  async function registerServiceWorker() {
+    const secureOrigin = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!('serviceWorker' in navigator) || !secureOrigin) return;
+    try {
+      await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+    } catch (_) {
+      // The core fitting tool remains fully usable if service-worker registration is unavailable.
+    }
+  }
 
   function setStatus(text, badge) {
     dom.measureStatus.textContent = text;
@@ -70,6 +109,9 @@
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         height: dom.height.value,
+        manualInseam: dom.manualInseam.value,
+        analogMode: state.analogMode,
+        quickFit: state.quickFit,
         bb: dom.bb.value,
         current: dom.current.value,
         crank: dom.crank.value,
@@ -82,9 +124,12 @@
   function restoreSettings() {
     try {
       const raw = localStorage.getItem(STORE_KEY) || localStorage.getItem(LEGACY_KEY);
-      if (!raw) return syncChoices();
+      if (!raw) { syncChoices(); syncMeasurementModes(); return; }
       const saved = JSON.parse(raw);
       if (saved.height || saved.heightCm) dom.height.value = saved.height || saved.heightCm;
+      if (saved.manualInseam) dom.manualInseam.value = saved.manualInseam;
+      state.analogMode = saved.analogMode === true;
+      state.quickFit = saved.quickFit === true;
       if (saved.bb || saved.bbHeight) dom.bb.value = saved.bb || saved.bbHeight;
       if (saved.current || saved.currentSaddle) dom.current.value = saved.current || saved.currentSaddle;
       if (saved.crank) dom.crank.value = saved.crank;
@@ -94,6 +139,40 @@
       else if (saved.fit === 'sport') state.purpose = 'sport';
     } catch (_) {}
     syncChoices();
+    syncMeasurementModes();
+  }
+
+  function syncMeasurementModes() {
+    dom.analogMode.checked = state.analogMode;
+    dom.quickFitMode.checked = state.quickFit;
+
+    dom.photoSection.classList.toggle('mode-disabled', state.analogMode);
+    dom.btnStartCamera.disabled = state.analogMode;
+    dom.btnGallery.disabled = state.analogMode;
+    dom.galleryInput.disabled = state.analogMode;
+    if (state.analogMode) {
+      stopCamera();
+      dom.btnSwitchCamera.disabled = true;
+      dom.btnCapture.disabled = true;
+      dom.btnRetake.disabled = true;
+      dom.btnUndoPoint.disabled = true;
+      setStatus('아날로그 측정 활성화: 신장과 줄자로 잰 인심을 직접 입력하고 사진 단계는 건너뜁니다.', 'ANALOG');
+    } else {
+      dom.btnRetake.disabled = !state.hasImage;
+      dom.btnUndoPoint.disabled = !state.points.length;
+      if (state.hasImage) setStatus(state.points.length === 3 ? '3점 측정이 준비되었습니다.' : `사진 위에서 ${POINT_LABELS[state.points.length]} 위치를 터치하세요.`, state.points.length === 3 ? 'MEASURED' : `POINT ${state.points.length + 1}/3`);
+      else setStatus('사진을 준비한 뒤 정수리 → 가랑이 → 발끝 순서로 터치하세요.', 'READY');
+    }
+
+    dom.bb.disabled = state.quickFit;
+    dom.current.disabled = state.quickFit;
+    dom.bbField.classList.toggle('quick-disabled', state.quickFit);
+    dom.currentField.classList.toggle('quick-disabled', state.quickFit);
+    dom.resultShell.classList.toggle('quick-mode', state.quickFit);
+    dom.quickBadge.hidden = !state.quickFit;
+    dom.quickResultLine.hidden = !state.quickFit || !state.result;
+    dom.btnCalculate.textContent = state.quickFit ? '간이 피팅값 계산' : '권장 안장 높이 계산';
+    updateSaveState();
   }
 
   function syncChoices() {
@@ -397,7 +476,10 @@
 
   function resolveInseam() {
     const manual = num(dom.manualInseam);
-    if (manual && manual >= 450 && manual <= 1100) return { value: manual, source: 'MANUAL', sourceKo: '직접 입력' };
+    if (manual && manual >= 450 && manual <= 1100) {
+      if (state.analogMode) return { value: manual, source: 'ANALOG', sourceKo: '아날로그 줄자 실측' };
+      return { value: manual, source: 'MANUAL', sourceKo: '직접 입력' };
+    }
     const photo = computePhotoInseam(false);
     if (photo) return { value: photo, source: 'PHOTO', sourceKo: '사진 3점 측정' };
     return null;
@@ -456,6 +538,11 @@
   }
 
   function updateGauge(target, current) {
+    if (state.quickFit) {
+      dom.fitGauge.dataset.state = 'idle';
+      dom.gaugeCaption.textContent = '간이피팅에서는 CURRENT 비교를 생략하고 TARGET 값만 제공합니다.';
+      return;
+    }
     if (!current) {
       dom.fitGauge.dataset.state = 'idle';
       dom.gaugeCaption.textContent = '현재 안장 높이를 입력하면 목표 대비 위치가 표시됩니다.';
@@ -476,6 +563,17 @@
   }
 
   function calculateFit(scroll = true) {
+    if (state.analogMode) {
+      const height = num(dom.height);
+      const manual = num(dom.manualInseam);
+      if (!height || height < 100 || height > 230 || !manual || manual < 450 || manual > 1100) {
+        state.result = null;
+        dom.resultState.textContent = 'NEED ANALOG';
+        dom.fitAnalysis.textContent = '아날로그 측정에서는 신장(cm)과 줄자로 측정한 인심(mm)을 모두 입력해 주세요.';
+        dom.quickResultLine.hidden = true;
+        return false;
+      }
+    }
     const inseam = resolveInseam();
     if (!inseam) {
       state.result = null;
@@ -484,41 +582,55 @@
       return false;
     }
 
-    const bb = num(dom.bb) || 0;
-    const current = num(dom.current);
+    const bb = state.quickFit ? null : (num(dom.bb) || 0);
+    const current = state.quickFit ? null : num(dom.current);
     const crank = crankCorrection();
     const baseTarget = inseam.value * BASE_COEFF;
     const target = baseTarget + crank.value;
-    const floor = target + bb;
+    const floor = bb == null ? null : target + bb;
     const delta = current ? target - current : null;
     const judgement = verdict(target, current);
 
-    state.result = { inseam: inseam.value, source: inseam.source, sourceKo: inseam.sourceKo, target, baseTarget, floor, current, delta, bb, bike: state.bike, purpose: state.purpose, crank };
+    state.result = { inseam: inseam.value, source: inseam.source, sourceKo: inseam.sourceKo, target, baseTarget, floor, current, delta, bb, bike: state.bike, purpose: state.purpose, crank, quickFit: state.quickFit, analogMode: state.analogMode };
 
-    dom.resultState.textContent = 'CALCULATED';
+    dom.resultState.textContent = state.quickFit ? 'QUICK FIT' : 'CALCULATED';
     dom.targetSaddle.textContent = round(target);
     dom.targetRange.textContent = `권장 확인 범위 ${round(target - RANGE_MM)}–${round(target + RANGE_MM)} mm`;
-    dom.heroCurrent.textContent = current ? round(current) : '—';
+    dom.heroCurrent.textContent = state.quickFit ? 'SKIP' : (current ? round(current) : '—');
     dom.heroTarget.textContent = round(target);
-    dom.heroChange.textContent = delta == null ? '—' : signed(delta);
+    dom.heroChange.textContent = state.quickFit ? 'SKIP' : (delta == null ? '—' : signed(delta));
     dom.resultBikeLine.textContent = `${BIKE[state.bike].label} · ${PURPOSE[state.purpose].label}`;
-    dom.resultMeta.textContent = crank.applied ? `LeMond 0.883 · CRANK ${crank.crank} mm corrected` : 'LeMond 0.883 · BB CENTER → SADDLE TOP';
+    dom.resultMeta.textContent = state.quickFit
+      ? (crank.applied ? `QUICK · LeMond 0.883 · CRANK ${crank.crank} mm corrected` : 'QUICK · LeMond 0.883 · BB CENTER → SADDLE TOP')
+      : (crank.applied ? `LeMond 0.883 · CRANK ${crank.crank} mm corrected` : 'LeMond 0.883 · BB CENTER → SADDLE TOP');
     dom.metricInseam.textContent = round(inseam.value);
     dom.metricSource.textContent = inseam.source;
     dom.metricCrank.textContent = crank.applied ? crank.crank : '—';
-    dom.metricFloor.textContent = round(floor);
-    dom.verdictBadge.dataset.verdict = judgement.code;
-    dom.verdictBadge.textContent = judgement.label;
-    dom.verdictText.textContent = judgement.text;
-    dom.adjustPlan.innerHTML = buildAdjustmentPlan(target, current);
+    dom.metricFloor.textContent = floor == null ? 'SKIP' : round(floor);
+    if (state.quickFit) {
+      dom.verdictBadge.dataset.verdict = 'idle';
+      dom.verdictBadge.textContent = 'QUICK FIT';
+      dom.verdictText.textContent = `현재 안장 실측을 생략한 간이 결과입니다. BB 중심 → 안장 상단 ${round(target)} mm를 현장 시작값으로 적용한 뒤 3–5 mm 범위에서 주행감으로 미세 조정하세요.`;
+      dom.adjustPlan.innerHTML = `<span class="orange">간이 측정값 ${round(target)} mm</span><br>현재 안장값이 없어 RAISE / LOWER 단계 계산은 생략합니다. 목표값 부근으로 맞춘 뒤 짧은 테스트 라이딩으로 확인하세요.`;
+    } else {
+      dom.verdictBadge.dataset.verdict = judgement.code;
+      dom.verdictBadge.textContent = judgement.label;
+      dom.verdictText.textContent = judgement.text;
+      dom.adjustPlan.innerHTML = buildAdjustmentPlan(target, current);
+    }
     dom.symptomAnalysis.innerHTML = symptomAdvice();
     updateGauge(target, current);
+    dom.quickBadge.hidden = !state.quickFit;
+    dom.quickResultLine.hidden = !state.quickFit;
+    if (state.quickFit) dom.quickResultLine.innerHTML = `간이 측정값: <strong>${round(target)} mm</strong>`;
     updateFieldGuide();
 
     const crankText = crank.applied
       ? ` 선택 크랭크 ${crank.crank} mm에 대해 170 mm 기준 대비 <strong>${signed(crank.value)} mm</strong> 보정을 적용했습니다.`
       : ' 크랭크 길이는 미입력되어 별도 보정을 적용하지 않았습니다.';
-    dom.fitAnalysis.innerHTML = `<strong>${inseam.sourceKo}</strong> 인심 <span class="orange">${round(inseam.value)} mm</span> × 0.883 = 기본 <strong>${round(baseTarget)} mm</strong>.${crankText} 최종 BB 기준 목표는 <span class="orange">${round(target)} mm</span>, 지면 참고값은 ${round(floor)} mm입니다.`;
+    const floorText = floor == null ? ' 간이피팅에서는 BB 지면 높이를 생략해 FLOOR REF.를 계산하지 않습니다.' : ` 지면 참고값은 ${round(floor)} mm입니다.`;
+    const modeText = state.quickFit ? ' <strong>QUICK MEASUREMENT</strong> 모드로 현재 안장과 BB 지면 입력을 생략했습니다.' : '';
+    dom.fitAnalysis.innerHTML = `<strong>${inseam.sourceKo}</strong> 인심 <span class="orange">${round(inseam.value)} mm</span> × 0.883 = 기본 <strong>${round(baseTarget)} mm</strong>.${crankText} 최종 BB 기준 목표는 <span class="orange">${round(target)} mm</span>.${floorText}${modeText}`;
 
     updateSaveState();
     saveSettings();
@@ -527,9 +639,11 @@
   }
 
   function updateSaveState() {
-    const ready = state.hasImage && state.points.length === 3 && !!resolveInseam();
+    const ready = !state.analogMode && state.hasImage && state.points.length === 3 && !!resolveInseam();
     dom.btnSavePhoto.disabled = !ready;
-    if (ready) dom.saveHint.textContent = '저장 이미지에는 3개 기준점·연결선·날짜·인심·Current→Target→Change가 함께 기록됩니다.';
+    if (state.analogMode) dom.saveHint.textContent = '아날로그 측정은 사진을 사용하지 않으므로 결과 사진 저장 기능이 비활성화됩니다.';
+    else if (ready) dom.saveHint.textContent = '저장 이미지에는 3개 기준점·연결선·날짜·인심·Current→Target→Change가 함께 기록됩니다.';
+    else dom.saveHint.textContent = '사진 3점 측정을 완료하면 측정 기준선과 피팅 결과를 이미지로 저장할 수 있습니다.';
   }
 
   function formatDate() {
@@ -664,6 +778,20 @@
     scheduleRecalc();
   });
 
+  dom.analogMode.addEventListener('change', () => {
+    state.analogMode = dom.analogMode.checked;
+    syncMeasurementModes();
+    saveSettings();
+    scheduleRecalc();
+  });
+
+  dom.quickFitMode.addEventListener('change', () => {
+    state.quickFit = dom.quickFitMode.checked;
+    syncMeasurementModes();
+    saveSettings();
+    scheduleRecalc();
+  });
+
   [dom.height, dom.manualInseam, dom.bb, dom.current, dom.crank].forEach((input) => input.addEventListener('input', () => {
     if (input === dom.height && state.points.length === 3) computePhotoInseam(true);
     saveSettings();
@@ -699,9 +827,18 @@
   dom.photoCanvas.addEventListener('pointercancel', () => { state.dragIndex = -1; });
   dom.btnCalculate.addEventListener('click', () => calculateFit(true));
   dom.btnSavePhoto.addEventListener('click', saveResultPhoto);
+  dom.btnDismissInstallTip?.addEventListener('click', () => {
+    try { localStorage.setItem(IOS_INSTALL_DISMISS_KEY, '1'); } catch (_) {}
+    dom.installTip.hidden = true;
+  });
   window.addEventListener('pagehide', stopCamera);
+  window.addEventListener('pageshow', syncIOSAppMode);
+  window.matchMedia?.('(display-mode: standalone)').addEventListener?.('change', syncIOSAppMode);
+  window.addEventListener('load', registerServiceWorker, { once: true });
 
+  syncIOSAppMode();
   restoreSettings();
+  syncMeasurementModes();
   updateTapSteps();
   updateQuality();
   updateFieldGuide();

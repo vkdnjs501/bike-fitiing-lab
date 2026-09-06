@@ -11,8 +11,8 @@
   <meta name="apple-mobile-web-app-title" content="Bike Fitting Lab">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
-  <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 카메라·갤러리 3점 인심 측정, Current→Target→Change, 정비사 조정 가이드, 결과 사진 저장.">
-  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.5.1</title>
+  <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 아날로그 측정·간이피팅·카메라/갤러리 3점 측정·정비사 대시보드.">
+  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.0</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
@@ -32,9 +32,9 @@
         <small>YEONGDEUNGPO BIKE FITTING LAB</small>
         <div class="signature">made by. HyunSeock.Son</div>
         <h1>안장 높이 피팅기</h1>
-        <p>Field fitting · Camera / Gallery · Current → Target → Change</p>
+        <p>Field fitting · Analog / Photo · Quick Measurement · Current → Target → Change</p>
       </div>
-      <div class="badge" aria-label="Beta version">BETA 1.5.1</div>
+      <div class="badge" aria-label="Beta version">BETA 1.6.0</div>
     </header>
 
     <nav class="flowbar" aria-label="피팅 순서">
@@ -72,8 +72,15 @@
           <div class="mini-note"><b>TIP</b><span>사진 측정은 신장을 축척으로 사용합니다. 줄자로 정확히 잰 인심이 있다면 직접 입력값을 우선합니다.</span></div>
         </section>
 
-        <section class="section photo-section">
-          <div class="section-title"><strong>현장 3점 측정</strong><span>카메라 또는 갤러리</span></div>
+        <section class="section photo-section" id="photoSection">
+          <div class="section-title section-title-with-toggle">
+            <div><strong>현장 3점 측정</strong><span>카메라 또는 갤러리</span></div>
+            <label class="mode-switch" for="analogMode">
+              <input id="analogMode" type="checkbox">
+              <span class="switch-ui" aria-hidden="true"></span>
+              <span class="switch-copy"><b>아날로그 측정</b><small>사진 단계 건너뛰기</small></span>
+            </label>
+          </div>
           <div class="source-actions">
             <button id="btnStartCamera" class="btn primary" type="button">카메라 켜기</button>
             <button id="btnGallery" class="btn ghost" type="button">갤러리에서 불러오기</button>
@@ -112,7 +119,14 @@
         </section>
 
         <section class="section">
-          <div class="section-title"><strong>자전거 타입</strong><span>현장 프리셋</span></div>
+          <div class="section-title section-title-with-toggle">
+            <div><strong>자전거 타입</strong><span>현장 프리셋</span></div>
+            <label class="mode-switch" for="quickFitMode">
+              <input id="quickFitMode" type="checkbox">
+              <span class="switch-ui" aria-hidden="true"></span>
+              <span class="switch-copy"><b>간이피팅</b><small>BB / 현재 안장 생략</small></span>
+            </label>
+          </div>
           <div class="choice-grid" id="bikeChoices">
             <button class="choice" type="button" data-bike="minivelo" data-bb="281"><b>MINI VELO</b><span>미니벨로</span></button>
             <button class="choice active" type="button" data-bike="road" data-bb="270"><b>ROAD</b><span>로드</span></button>
@@ -122,11 +136,11 @@
           </div>
 
           <div class="fields three compact-top">
-            <div class="field">
+            <div class="field" id="bbField" data-quick-skip>
               <label for="bbHeight">BB 지면 높이 · mm <span>보조값</span></label>
               <input id="bbHeight" type="number" inputmode="decimal" min="200" max="400" step="1" value="270">
             </div>
-            <div class="field">
+            <div class="field" id="currentField" data-quick-skip>
               <label for="currentSaddle">현재 안장 · mm <span>BB→안장</span></label>
               <input id="currentSaddle" type="number" inputmode="decimal" min="450" max="1000" step="1" placeholder="예: 700">
             </div>
@@ -175,13 +189,17 @@
                 <h3 id="resultBikeLine">ROAD · ENDURANCE</h3>
                 <p class="meta" id="resultMeta">LeMond 0.883 · BB CENTER → SADDLE TOP</p>
               </div>
-              <div class="status" id="resultState">READY</div>
+              <div class="hero-statuses">
+                <div class="quick-badge" id="quickBadge" hidden>QUICK MEASUREMENT</div>
+                <div class="status" id="resultState">READY</div>
+              </div>
             </div>
 
             <div class="target-panel">
               <div class="target-label">TARGET</div>
               <div class="target-number"><span id="targetSaddle">—</span><small>mm</small></div>
               <div class="range" id="targetRange">권장 확인 범위 —</div>
+              <div class="quick-result-line" id="quickResultLine" hidden>간이 측정값: <strong>— mm</strong></div>
             </div>
 
             <div class="ctc-grid" aria-label="Current Target Change">
@@ -259,8 +277,8 @@
     </main>
 
     <footer class="footer">
-      <div>BETA 1.5.1 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
-      <div>Calculation base: LeMond 0.883 · BB center → saddle top · optional crank-length correction</div>
+      <div>BETA 1.6.0 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
+      <div>Quick mode skips BB floor/current saddle inputs · Calculation base: LeMond 0.883 · optional crank-length correction</div>
     </footer>
   </div>
 

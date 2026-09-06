@@ -2,7 +2,7 @@
   "id": "./",
   "name": "YEONGDEUNGPO BIKE FITTING LAB",
   "short_name": "Fitting Lab",
-  "description": "영등포 현장형 자전거 안장 높이 피팅 도구",
+  "description": "영등포 현장형 자전거 안장 높이 피팅 도구 · 아날로그 측정 · Quick Fitting · 사진 3점 측정",
   "lang": "ko-KR",
   "start_url": "./",
   "scope": "./",
@@ -10,7 +10,10 @@
   "background_color": "#02070b",
   "theme_color": "#02070b",
   "orientation": "any",
-  "categories": ["sports", "utilities"],
+  "categories": [
+    "sports",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "./icons/icon-192.png",
