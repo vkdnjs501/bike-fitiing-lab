@@ -1,39 +1,58 @@
-# Beta 1.6.5 QA Report
+# Beta 1.6.6 QA Report
 
-Build: `1.6.5-pro-ui1`
+Build: `1.6.6-cm-ui1`
 
-## Target regression scenario
+## Runtime regression — PRO Analog
+Tested in headless Chromium with the production HTML/CSS/JS loaded as one document.
+
+Inputs:
 - Height: 172 cm
 - Manual inseam: 80.0 cm
 - Analog Measurement: ON
-- Quick Fitting: forced OFF
 - Bike: MTB
-- BB floor height: 300 mm
-- Current saddle: 706 mm
-- Crank: 170 mm
+- BB floor height: 30.0 cm
+- Current saddle: 70.6 cm
+- Crank: 17.0 cm
 - Purpose: COMMUTE
 
-### Expected / verified
+Verified output:
+- Result state: **PRO FIT**
 - PRO MEASUREMENT: visible
 - QUICK MEASUREMENT: hidden
-- Result state: PRO FIT
-- Professional measurement result: 706 mm
-- Measurement source: ANALOG
-- Target: 706 mm
+- Target: **70.6 cm**
+- Current: **70.6 cm**
+- Change: **+0.0 cm**
+- Inseam: **80.0 cm**
+- Crank: **17.0 cm**
+- Floor reference: **100.6 cm**
+- Usage status: **READY**
 
-## Mode conflict regression
-- Analog OFF + Quick ON -> QUICK FIT only
-- Re-enable Analog -> Quick is automatically unchecked and disabled
-- Recalculate -> PRO FIT only
+## Runtime regression — Quick Fitting
+- Analog Measurement: OFF
+- Quick Fitting: ON
+- Inseam: 80.0 cm
+- Purpose: COMMUTE
+
+Verified output:
+- Result state: **QUICK FIT**
+- Quick target: **70.3 cm**
+- QUICK MEASUREMENT: visible
+- PRO MEASUREMENT: hidden
+
+## Unit audit
+- Visible page text containing the old `mm` unit after runtime load: **0**
+- BB/current/crank inputs: cm
+- Dashboard, analysis, adjustment plan and result-photo export strings: cm
+
+## Saved-setting migration
+Legacy Beta 1.6.5 values are migrated automatically:
+- BB 300 → 30.0 cm
+- Current 706 → 70.6 cm
+- Crank 170 → 17.0 cm
 
 ## Static QA
-- app.js syntax: PASS
-- service-worker.js syntax: PASS
-- manifest JSON: PASS
-- Mobile 390 px horizontal overflow: 0 px
-- Browser runtime/page errors: 0
-
-## Deployment hardening
-- HTML/CSS/JS/Service Worker build query: `1.6.5-pro-ui1`
-- Service Worker cache: `bike-fitting-lab-v1.6.5-pro-ui1`
-- App assets use network-first delivery with cache fallback to reduce stale GitHub Pages / iOS PWA code.
+- `app.js` syntax: PASS
+- `service-worker.js` syntax: PASS
+- `manifest.webmanifest`: PASS
+- Duplicate DOM IDs: 0
+- Missing JS-referenced DOM IDs: 0

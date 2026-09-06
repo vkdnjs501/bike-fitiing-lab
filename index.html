@@ -12,8 +12,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 아날로그 측정·간이피팅·카메라/갤러리 3점 측정·정비사 대시보드.">
-  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.5</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=1.6.5-pro-ui1">
+  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.6</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=1.6.6-cm-ui1">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
@@ -23,9 +23,9 @@
   <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
-  <link rel="stylesheet" href="./style.css?v=1.6.5-pro-ui1">
+  <link rel="stylesheet" href="./style.css?v=1.6.6-cm-ui1">
 </head>
-<body data-build="1.6.5-pro-ui1">
+<body data-build="1.6.6-cm-ui1">
   <div class="wrap">
     <header class="topbar">
       <div class="brand">
@@ -34,7 +34,7 @@
         <h1>안장 높이 피팅기</h1>
         <p>Field fitting · Analog / Photo · Quick Measurement · Current → Target → Change</p>
       </div>
-      <div class="badge" aria-label="Beta version">BETA 1.6.5</div>
+      <div class="badge" aria-label="Beta version">BETA 1.6.6</div>
     </header>
 
     <nav class="flowbar" aria-label="피팅 순서">
@@ -128,25 +128,25 @@
             </label>
           </div>
           <div class="choice-grid" id="bikeChoices">
-            <button class="choice" type="button" data-bike="minivelo" data-bb="281"><b>MINI VELO</b><span>미니벨로</span></button>
-            <button class="choice active" type="button" data-bike="road" data-bb="270"><b>ROAD</b><span>로드</span></button>
-            <button class="choice" type="button" data-bike="gravel" data-bb="280"><b>GRAVEL</b><span>그래블</span></button>
-            <button class="choice" type="button" data-bike="hybrid" data-bb="260"><b>HYBRID & CITY</b><span>하이브리드 · 생활형</span></button>
-            <button class="choice" type="button" data-bike="mtb" data-bb="300"><b>MTB</b><span>산악자전거</span></button>
+            <button class="choice" type="button" data-bike="minivelo" data-bb="28.1"><b>MINI VELO</b><span>미니벨로</span></button>
+            <button class="choice active" type="button" data-bike="road" data-bb="27.0"><b>ROAD</b><span>로드</span></button>
+            <button class="choice" type="button" data-bike="gravel" data-bb="28.0"><b>GRAVEL</b><span>그래블</span></button>
+            <button class="choice" type="button" data-bike="hybrid" data-bb="26.0"><b>HYBRID & CITY</b><span>하이브리드 · 생활형</span></button>
+            <button class="choice" type="button" data-bike="mtb" data-bb="30.0"><b>MTB</b><span>산악자전거</span></button>
           </div>
 
           <div class="fields three compact-top">
             <div class="field" id="bbField" data-quick-skip>
-              <label for="bbHeight">BB 지면 높이 · mm <span>보조값</span></label>
-              <input id="bbHeight" type="number" inputmode="decimal" min="200" max="400" step="1" value="270">
+              <label for="bbHeight">BB 지면 높이 · cm <span>보조값</span></label>
+              <input id="bbHeight" type="number" inputmode="decimal" min="20" max="40" step="0.1" value="27.0">
             </div>
             <div class="field" id="currentField" data-quick-skip>
-              <label for="currentSaddle">현재 안장 · mm <span>BB→안장</span></label>
-              <input id="currentSaddle" type="number" inputmode="decimal" min="450" max="1000" step="1" placeholder="예: 700">
+              <label for="currentSaddle">현재 안장 · cm <span>BB→안장</span></label>
+              <input id="currentSaddle" type="number" inputmode="decimal" min="45" max="100" step="0.1" placeholder="예: 70.0">
             </div>
             <div class="field" id="crankField" data-quick-skip>
-              <label for="crankLength">크랭크 · mm <span>선택</span></label>
-              <input id="crankLength" type="number" inputmode="decimal" min="140" max="190" step="2.5" placeholder="예: 170">
+              <label for="crankLength">크랭크 · cm <span>선택</span></label>
+              <input id="crankLength" type="number" inputmode="decimal" min="14" max="19" step="0.25" placeholder="예: 17.0">
             </div>
           </div>
           <p class="hint">메인 피팅값은 <strong>BB 중심 → 안장 상단</strong>입니다. BB 지면 높이는 결과 사진의 FLOOR REF. 보조값에만 사용됩니다.</p>
@@ -159,7 +159,7 @@
             <button class="choice active" type="button" data-purpose="endurance"><b>ENDURANCE</b><span>장거리 · 균형</span></button>
             <button class="choice" type="button" data-purpose="sport"><b>SPORT</b><span>운동 · 빠른 주행</span></button>
           </div>
-          <p class="hint">정밀 피팅은 0.883 기준을 유지합니다. 간이피팅에서는 현장 시작값 구분을 위해 COMMUTE -3 / ENDURANCE 0 / SPORT +3 mm의 소폭 목적 트림을 적용합니다.</p>
+          <p class="hint">정밀 피팅은 0.883 기준을 유지합니다. 간이피팅에서는 현장 시작값 구분을 위해 COMMUTE -0.3 / ENDURANCE 0 / SPORT +0.3 cm의 소폭 목적 트림을 적용합니다.</p>
         </section>
 
         <details class="section advanced" id="riderCheckDetails">
@@ -198,16 +198,16 @@
 
             <div class="target-panel">
               <div class="target-label">TARGET</div>
-              <div class="target-number"><span id="targetSaddle">—</span><small>mm</small></div>
+              <div class="target-number"><span id="targetSaddle">—</span><small>cm</small></div>
               <div class="range" id="targetRange">권장 확인 범위 —</div>
-              <div class="pro-result-line" id="proResultLine" hidden><span class="pro-result-label">PRO FIT VERIFIED</span><span>전문가 측정값 <strong>— mm</strong></span></div>
-              <div class="quick-result-line" id="quickResultLine" hidden>간이 측정값: <strong>— mm</strong></div>
+              <div class="pro-result-line" id="proResultLine" hidden><span class="pro-result-label">PRO FIT VERIFIED</span><span>전문가 측정값 <strong>— cm</strong></span></div>
+              <div class="quick-result-line" id="quickResultLine" hidden>간이 측정값: <strong>— cm</strong></div>
             </div>
 
             <div class="ctc-grid" aria-label="Current Target Change">
-              <div class="ctc"><span>CURRENT</span><b id="heroCurrent">—</b><small>mm</small></div>
-              <div class="ctc target"><span>TARGET</span><b id="heroTarget">—</b><small>mm</small></div>
-              <div class="ctc change"><span>CHANGE</span><b id="heroChange">—</b><small>mm</small></div>
+              <div class="ctc"><span>CURRENT</span><b id="heroCurrent">—</b><small>cm</small></div>
+              <div class="ctc target"><span>TARGET</span><b id="heroTarget">—</b><small>cm</small></div>
+              <div class="ctc change"><span>CHANGE</span><b id="heroChange">—</b><small>cm</small></div>
             </div>
 
             <div class="fit-gauge" id="fitGauge" data-state="idle">
@@ -222,10 +222,10 @@
           </div>
 
           <div class="metric-strip">
-            <div class="metric"><b id="metricInseam">—</b><span>INSEAM · mm</span></div>
+            <div class="metric"><b id="metricInseam">—</b><span>INSEAM · cm</span></div>
             <div class="metric"><b id="metricSource">—</b><span>MEASURE SOURCE</span></div>
-            <div class="metric"><b id="metricCrank">—</b><span>CRANK · mm</span></div>
-            <div class="metric"><b id="metricFloor">—</b><span>FLOOR REF. · mm</span></div>
+            <div class="metric"><b id="metricCrank">—</b><span>CRANK · cm</span></div>
+            <div class="metric"><b id="metricFloor">—</b><span>FLOOR REF. · cm</span></div>
           </div>
 
           <div class="insight mechanic-verdict">
@@ -237,7 +237,7 @@
           </div>
 
           <div class="insight">
-            <div class="section-title"><strong>ADJUSTMENT PLAN</strong><span>5 mm 이하 단계 조정</span></div>
+            <div class="section-title"><strong>ADJUSTMENT PLAN</strong><span>0.5 cm 이하 단계 조정</span></div>
             <div id="adjustPlan" class="analysis-copy">현재 안장 높이를 입력하면 목표값까지 단계별 조정량을 안내합니다.</div>
           </div>
 
@@ -270,10 +270,10 @@
           <div class="head"><h2>REFERENCE / 측정 기준</h2><span class="kicker">FIELD NOTE</span></div>
           <div class="section reference-copy">
             <p><strong>기본값</strong>은 인심 × 0.883의 LeMond 방식이며 BB 중심에서 안장 상단까지를 측정합니다.</p>
-            <p><strong>크랭크 보정</strong>은 입력한 경우 170 mm를 중립 기준으로 페달 최하점 도달거리 차이를 같은 mm만큼 반대로 보정하는 현장 참고값입니다.</p>
+            <p><strong>크랭크 보정</strong>은 입력한 경우 17.0 cm를 중립 기준으로 페달 최하점 도달거리 차이를 같은 cm만큼 반대로 보정하는 현장 참고값입니다.</p>
             <p><strong>사진 측정</strong>은 사진 속 정수리–발끝 길이를 입력 신장으로 환산한 뒤 가랑이–발끝 비율을 적용합니다. 원근·자세에 따라 오차가 생길 수 있어 줄자 실측이 우선입니다.</p>
             <p><strong>PRO MEASUREMENT</strong>는 사진 3점 측정을 사용하지 않고 아날로그 직접 수치로 피팅할 때 표시됩니다. 신장·인심·BB 지면 높이·현재 안장이 필요하며 크랭크는 선택 입력입니다.</p>
-            <p><strong>Quick 목적 트림</strong>은 간이피팅에서만 COMMUTE -3 mm / ENDURANCE 0 mm / SPORT +3 mm를 적용하며, 정밀/PRO 피팅 계산에는 적용하지 않습니다.</p>
+            <p><strong>Quick 목적 트림</strong>은 간이피팅에서만 COMMUTE -0.3 cm / ENDURANCE 0 cm / SPORT +0.3 cm를 적용하며, 정밀/PRO 피팅 계산에는 적용하지 않습니다.</p>
             <p class="warning">※ 본 도구는 현장 피팅 시작점을 위한 참고 도구입니다. 통증을 진단하지 않으며, 지속되는 통증은 안장 높이 하나로 원인을 단정하지 마세요.</p>
           </div>
         </section>
@@ -289,13 +289,13 @@
     </main>
 
     <footer class="footer">
-      <div>BETA 1.6.5 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
-      <div>Modes: PRO Analog Numeric / Quick Fitting · Quick purpose trim ±3 mm · Calculation base: LeMond 0.883</div>
+      <div>BETA 1.6.6 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
+      <div>Modes: PRO Analog Numeric / Quick Fitting · Quick purpose trim ±0.3 cm · Calculation base: LeMond 0.883</div>
     </footer>
   </div>
 
   <canvas id="sourceCanvas" class="visually-hidden"></canvas>
   <canvas id="exportCanvas" class="visually-hidden"></canvas>
-  <script src="./app.js?v=1.6.5-pro-ui1"></script>
+  <script src="./app.js?v=1.6.6-cm-ui1"></script>
 </body>
 </html>

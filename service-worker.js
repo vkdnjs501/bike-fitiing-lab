@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'bike-fitting-lab-v1.6.2-qm1';
+const CACHE_NAME = 'bike-fitting-lab-v1.6.6-cm-ui1';
 const APP_SHELL = [
   './',
   './index.html',
@@ -52,18 +52,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first for app code/assets so GitHub Pages updates do not keep stale JS/CSS.
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response && response.status === 200 && response.type === 'basic') {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
+    fetch(request)
+      .then((response) => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      })
+      .catch(() => caches.match(request))
   );
 });
