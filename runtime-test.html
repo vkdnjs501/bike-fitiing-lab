@@ -13,7 +13,7 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 아날로그 측정·간이피팅·카메라/갤러리 3점 측정·정비사 대시보드.">
   <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.1</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=1.6.1-cm1">
+  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
-  <link rel="stylesheet" href="./style.css?v=1.6.1-cm1">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <div class="wrap">
@@ -65,8 +65,8 @@
               <input id="heightCm" type="number" inputmode="decimal" min="100" max="230" step="0.1" placeholder="예: 175">
             </div>
             <div class="field">
-              <label for="manualInseam">인심 직접입력 · cm</label>
-              <input id="manualInseam" type="number" inputmode="decimal" min="45" max="110" step="0.1" placeholder="예: 80.0">
+              <label for="manualInseam">인심 직접입력 · mm</label>
+              <input id="manualInseam" type="number" inputmode="decimal" min="450" max="1100" step="1" placeholder="사진 사용 시 자동">
             </div>
           </div>
           <div class="mini-note"><b>TIP</b><span>사진 측정은 신장을 축척으로 사용합니다. 줄자로 정확히 잰 인심이 있다면 직접 입력값을 우선합니다.</span></div>
@@ -284,6 +284,30 @@
 
   <canvas id="sourceCanvas" class="visually-hidden"></canvas>
   <canvas id="exportCanvas" class="visually-hidden"></canvas>
-  <script src="./app.js?v=1.6.1-cm1"></script>
+  <script src="./app.js"></script>
+
+<script>
+(function(){
+  const q=id=>document.getElementById(id);
+  q('heightCm').value='175';
+  q('manualInseam').value='800';
+  q('crankLength').value='175';
+  q('analogMode').checked=true; q('analogMode').dispatchEvent(new Event('change',{bubbles:true}));
+  q('quickFitMode').checked=true; q('quickFitMode').dispatchEvent(new Event('change',{bubbles:true}));
+  q('btnCalculate').click();
+  const out=document.createElement('pre'); out.id='runtimeProbe';
+  out.textContent=JSON.stringify({
+    state:q('resultState').textContent,
+    target:q('targetSaddle').textContent,
+    quick:q('quickResultLine').textContent.trim(),
+    bbDisabled:q('bbHeight').disabled,
+    currentDisabled:q('currentSaddle').disabled,
+    crankDisabled:q('crankLength').disabled,
+    metricCrank:q('metricCrank').textContent,
+    meta:q('resultMeta').textContent
+  });
+  document.body.appendChild(out);
+})();
+</script>
 </body>
 </html>

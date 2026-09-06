@@ -35,3 +35,10 @@ Full Fitting mode retains optional crank correction, BB floor reference, Current
 
 ## Browser-runner note
 The local Chromium sandbox in this build environment rejected local/file navigation during automated CDP execution. For this patch, browser interaction claims are therefore not overstated: validation was completed through syntax, DOM contract, event binding, state-guard, cache-version, and calculation regression checks. Final physical iOS Safari interaction should be verified after GitHub Pages deployment.
+
+
+## Silent hotfix — direct inseam unit
+- Direct inseam UI changed from mm to cm.
+- Internal fitting calculation remains millimeter-based.
+- 80.0 cm is converted internally to 800 mm.
+- Legacy saved mm values are migrated to cm display.
