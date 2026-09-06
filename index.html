@@ -2,16 +2,27 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#02070b">
+  <meta name="color-scheme" content="dark">
+  <meta name="application-name" content="Bike Fitting Lab">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bike Fitting Lab">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 카메라·갤러리 3점 인심 측정, Current→Target→Change, 정비사 조정 가이드, 결과 사진 저장.">
-  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.5.0</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2302070b'/%3E%3Ccircle cx='29' cy='70' r='17' fill='none' stroke='%23ff6b00' stroke-width='7'/%3E%3Ccircle cx='73' cy='70' r='17' fill='none' stroke='%23ff6b00' stroke-width='7'/%3E%3Cpath d='M29 70L48 38L73 70M48 38L40 70M48 38L60 46' fill='none' stroke='%23ff6b00' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.5.1</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon-152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="./icons/apple-touch-icon-120.png">
+  <link rel="icon" href="./favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -23,7 +34,7 @@
         <h1>안장 높이 피팅기</h1>
         <p>Field fitting · Camera / Gallery · Current → Target → Change</p>
       </div>
-      <div class="badge" aria-label="Beta version">BETA 1.5.0</div>
+      <div class="badge" aria-label="Beta version">BETA 1.5.1</div>
     </header>
 
     <nav class="flowbar" aria-label="피팅 순서">
@@ -32,6 +43,15 @@
       <span class="flow"><b>03</b> PURPOSE</span>
       <span class="flow"><b>04</b> FIT RESULT</span>
     </nav>
+
+    <aside class="ios-install-tip" id="installTip" hidden aria-label="iOS 홈 화면 설치 안내">
+      <div class="install-icon" aria-hidden="true"><img src="./icons/apple-touch-icon-120.png" alt=""></div>
+      <div class="install-copy">
+        <b>iOS HOME SCREEN</b>
+        <span>Safari 공유 → <strong>홈 화면에 추가</strong> → “웹 앱으로 열기”를 유지하면 전용 아이콘으로 앱처럼 실행됩니다.</span>
+      </div>
+      <button id="btnDismissInstallTip" type="button" aria-label="홈 화면 설치 안내 닫기">×</button>
+    </aside>
 
     <main class="grid">
       <section class="card setup-card">
@@ -239,7 +259,7 @@
     </main>
 
     <footer class="footer">
-      <div>BETA 1.5.0 · Field Mechanic Dashboard · Camera / Gallery / Result image export</div>
+      <div>BETA 1.5.1 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
       <div>Calculation base: LeMond 0.883 · BB center → saddle top · optional crank-length correction</div>
     </footer>
   </div>

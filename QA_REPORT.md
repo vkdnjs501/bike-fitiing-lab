@@ -1,48 +1,39 @@
-# Beta 1.5.0 QA Report
+# Beta 1.5.1 QA Report
 
 ## Static checks
 
 - `node --check app.js`: PASS
-- HTML ID duplicates: 0
+- `node --check service-worker.js`: PASS
+- `manifest.webmanifest` JSON parse: PASS
+- HTML duplicate IDs: 0
 - JavaScript DOM reference misses: 0
-- Legacy 1.1.0 version strings in production files: 0
-- Removed experimental 0.860 / 0.900 fit coefficients: confirmed
+- Required icon files: present
+- Apple Touch Icon dimensions: 120 / 152 / 167 / 180 px verified
+- PWA icon dimensions: 192 / 512 / 1024 px verified
+- Production HTML version string: Beta 1.5.1
 
-## Runtime checks — Chromium
+## Regression scope
 
-PASS scenarios:
+The Beta 1.5 fitting workflow remains unchanged:
 
-1. Manual inseam input → calculation
+1. Manual inseam calculation
 2. Current → Target → Change dashboard
-3. RAISE / LOWER / HOLD verdict logic
-4. Purpose switch without changing the 0.883 base target
-5. Symptom-check analysis
-6. Gallery image load
-7. Three-point photo measurement
-8. Measurement quality indicator
-9. Three-point drag refinement
-10. Result JPG generation and download
-11. Mobile 390 px responsive layout
-12. Camera API fallback path
-13. Mock MediaStream camera LIVE path
-14. Video frame capture → measurement canvas transition
+3. Bike / riding-purpose selection
+4. Symptom analysis
+5. Camera / gallery workflow
+6. Three-point measurement and drag correction
+7. Result-image export
 
-Browser console errors: 0
-Page runtime errors: 0
+## Beta 1.5.1 platform scope
 
-## Calculation regression sample
-
-- Inseam 800 mm
-- Crank 170 mm
-- Expected base target: 800 × 0.883 = 706.4 mm
-- Displayed target: 706 mm
-- Current 690 mm → displayed change: +16 mm
-
-## Code cleanup
-
-- Repeated DOM lookups consolidated into one cached DOM map.
-- Fit constants and labels centralized.
-- Input recalculation requests coalesced with `requestAnimationFrame`.
-- Photo inseam resolution no longer changes status text as a side effect during every save-state check.
-- Legacy settings migration retained while using a new 1.5 storage key.
-- Photo point rendering, measurement, verdict, adjustment plan and export responsibilities separated into focused functions.
+1. Manifest loading
+2. Apple Touch Icon references
+3. Favicon references
+4. iOS Safari install helper visibility logic
+5. Standalone-mode detection
+6. Safe-area CSS
+7. Mobile numeric input zoom prevention
+8. Service-worker registration
+9. App-shell cache installation
+10. Old Bike Fitting Lab cache cleanup
+11. Offline navigation fallback
