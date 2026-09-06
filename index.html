@@ -12,8 +12,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 아날로그 측정·간이피팅·카메라/갤러리 3점 측정·정비사 대시보드.">
-  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.4</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=1.6.4-profix1">
+  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.5</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=1.6.5-pro-ui1">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
@@ -23,9 +23,9 @@
   <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
-  <link rel="stylesheet" href="./style.css?v=1.6.4-profix1">
+  <link rel="stylesheet" href="./style.css?v=1.6.5-pro-ui1">
 </head>
-<body>
+<body data-build="1.6.5-pro-ui1">
   <div class="wrap">
     <header class="topbar">
       <div class="brand">
@@ -34,7 +34,7 @@
         <h1>안장 높이 피팅기</h1>
         <p>Field fitting · Analog / Photo · Quick Measurement · Current → Target → Change</p>
       </div>
-      <div class="badge" aria-label="Beta version">BETA 1.6.4</div>
+      <div class="badge" aria-label="Beta version">BETA 1.6.5</div>
     </header>
 
     <nav class="flowbar" aria-label="피팅 순서">
@@ -190,7 +190,7 @@
                 <p class="meta" id="resultMeta">LeMond 0.883 · BB CENTER → SADDLE TOP</p>
               </div>
               <div class="hero-statuses">
-                <div class="pro-badge" id="proBadge" hidden>PRO MEASUREMENT</div>
+                <div class="pro-badge" id="proBadge" hidden><span class="pro-check" aria-hidden="true">✓</span><span>PRO MEASUREMENT</span></div>
                 <div class="quick-badge" id="quickBadge" hidden>QUICK MEASUREMENT</div>
                 <div class="status" id="resultState">READY</div>
               </div>
@@ -200,7 +200,7 @@
               <div class="target-label">TARGET</div>
               <div class="target-number"><span id="targetSaddle">—</span><small>mm</small></div>
               <div class="range" id="targetRange">권장 확인 범위 —</div>
-              <div class="pro-result-line" id="proResultLine" hidden>전문가 측정값: <strong>— mm</strong></div>
+              <div class="pro-result-line" id="proResultLine" hidden><span class="pro-result-label">PRO FIT VERIFIED</span><span>전문가 측정값 <strong>— mm</strong></span></div>
               <div class="quick-result-line" id="quickResultLine" hidden>간이 측정값: <strong>— mm</strong></div>
             </div>
 
@@ -289,13 +289,13 @@
     </main>
 
     <footer class="footer">
-      <div>BETA 1.6.4 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
+      <div>BETA 1.6.5 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
       <div>Modes: PRO Analog Numeric / Quick Fitting · Quick purpose trim ±3 mm · Calculation base: LeMond 0.883</div>
     </footer>
   </div>
 
   <canvas id="sourceCanvas" class="visually-hidden"></canvas>
   <canvas id="exportCanvas" class="visually-hidden"></canvas>
-  <script src="./app.js?v=1.6.4-profix1"></script>
+  <script src="./app.js?v=1.6.5-pro-ui1"></script>
 </body>
 </html>

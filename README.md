@@ -1,10 +1,12 @@
-# YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.4
+# YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.5
 
-Field-oriented saddle-height fitting web app for GitHub Pages.
+PRO measurement classification reliability + PRO dashboard identity update.
 
-## Beta 1.6.4
-- Fixes incorrect `QUICK MEASUREMENT` exposure during analog/direct numeric fitting.
-- Analog/direct numeric fitting is classified as `PRO MEASUREMENT / PRO FIT`.
-- Required PRO numeric inputs: height, manual inseam, BB floor height, current saddle height, bike type and riding purpose.
-- Crank length remains optional.
-- Analog and Quick modes are mutually exclusive to prevent UI/state conflicts.
+## Mode rules
+- **PRO MEASUREMENT**: Analog Measurement ON + valid direct numeric rider/bike inputs.
+- **QUICK MEASUREMENT**: Quick Fitting ON while Analog Measurement is OFF.
+- **STANDARD**: Photo 3-point or normal non-quick workflow.
+
+The PRO and QUICK modes are mutually exclusive. The result dashboard renders its badge from the mode that actually produced the calculation.
+
+GitHub Pages files: `index.html`, `style.css`, `app.js`, `manifest.webmanifest`, `service-worker.js`, icon assets.

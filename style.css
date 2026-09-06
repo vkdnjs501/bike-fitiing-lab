@@ -76,3 +76,17 @@ html.standalone .topbar{padding-top:8px}
 .mode-switch.is-disabled{opacity:.48;cursor:not-allowed;filter:saturate(.65)}
 .mode-switch.is-disabled .switch-copy small{color:#536671}
 .mode-switch.is-disabled .switch-ui{background:#111e26;border-color:#263944}
+
+
+/* Beta 1.6.5 — PRO measurement identity */
+.pro-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid rgba(255,151,64,.72);border-radius:999px;color:#ffd9bb;background:linear-gradient(135deg,rgba(255,107,0,.16),rgba(255,107,0,.055));font-size:7px;font-weight:950;letter-spacing:.095em;white-space:nowrap;box-shadow:0 0 0 1px rgba(255,107,0,.07) inset,0 8px 24px rgba(255,107,0,.10)}
+.pro-badge .pro-check{display:grid;place-items:center;width:15px;height:15px;border-radius:50%;color:#120904;background:#ff8a32;font-size:9px;font-weight:1000;box-shadow:0 0 14px rgba(255,123,31,.28)}
+.pro-result-line{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;width:max-content;max-width:100%;margin:12px auto 0;padding:9px 12px;color:#dfe8ec;background:linear-gradient(135deg,rgba(255,107,0,.10),rgba(5,16,23,.72));border:1px solid rgba(255,151,64,.40);border-radius:13px;font-size:9px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.pro-result-line .pro-result-label{color:#ff9f58;font-size:7px;font-weight:950;letter-spacing:.12em}
+.pro-result-line strong{color:#ffd0aa;font-weight:950;font-variant-numeric:tabular-nums}
+.status[data-mode="professional"]{color:#ffd1ae;background:rgba(255,107,0,.10);border-color:rgba(255,151,64,.42);box-shadow:0 0 18px rgba(255,107,0,.08)}
+.status[data-mode="quick"]{color:#171006;background:linear-gradient(120deg,#ffb06f,#ff7a1a);border-color:transparent}
+.result-shell.professional-mode .hero{background:radial-gradient(circle at 88% 7%,rgba(255,107,0,.15),transparent 27%),linear-gradient(180deg,#111f2b,#0c1720)}
+.result-shell.professional-mode .target-number span{color:#fff;text-shadow:0 0 24px rgba(255,107,0,.07)}
+.result-shell.professional-mode .ctc.target{border-color:rgba(255,139,52,.58);box-shadow:inset 0 0 22px rgba(255,107,0,.035)}
+@media(max-width:560px){.pro-badge{padding:6px 8px;gap:5px;white-space:normal;text-align:center;line-height:1.15}.pro-badge .pro-check{width:14px;height:14px;flex:0 0 14px}.pro-result-line{gap:6px;padding:8px 10px}}

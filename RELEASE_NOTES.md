@@ -1,12 +1,9 @@
-# Beta 1.6.4 — PRO Measurement Classification Fix
+# Beta 1.6.5 — PRO Measurement Classification & Dashboard Fix
 
-Small reliability update correcting measurement-mode classification.
-
-## Fixed
-- Analog/direct numeric fitting now takes priority as **PRO MEASUREMENT**.
-- `QUICK MEASUREMENT` is reserved for the explicit Quick Fitting workflow only.
-- Enabling Analog Measurement automatically turns Quick Fitting off to prevent conflicting states.
-- PRO mode requires height, manual inseam, BB floor height, and current saddle height; crank length remains optional.
-- Result Dashboard now correctly shows **PRO FIT** and **전문가 측정값** after a valid analog numeric calculation.
-- Quick/PRO badges are shown only after a valid result is calculated, preventing stale mode badges.
-- Asset/service-worker cache version updated for GitHub Pages deployment.
+- Fixed stale QUICK MEASUREMENT exposure during Analog numeric fitting.
+- Analog numeric fitting now always resolves to **PRO MEASUREMENT / PRO FIT** after valid input validation.
+- Added dedicated PRO verified badge and Professional Measurement Result UI.
+- PRO and QUICK modes are now strictly mutually exclusive.
+- Result badges use the mode stored with the calculation result to prevent reclassification.
+- Updated Service Worker to network-first asset delivery to reduce stale GitHub Pages / iOS PWA code.
+- Synchronized HTML, CSS, JS and Service Worker build IDs to `1.6.5-pro-ui1`.

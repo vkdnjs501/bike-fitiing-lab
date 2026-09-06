@@ -1,45 +1,39 @@
-# Bike Fitting Lab Beta 1.6.4 — QA Report
+# Beta 1.6.5 QA Report
 
-## Focus
-PRO/QUICK measurement-state classification fix.
+Build: `1.6.5-pro-ui1`
 
-## Runtime validation
-Chromium browser DOM/runtime harness, 390 × 844 mobile viewport.
-
-### PRO Analog Numeric flow
-Input:
-- Height: 175 cm
+## Target regression scenario
+- Height: 172 cm
 - Manual inseam: 80.0 cm
 - Analog Measurement: ON
-- Bike: MINI VELO
-- BB floor height: 281 mm
-- Current saddle: 700 mm
-- Crank: blank (optional)
-- Purpose: ENDURANCE
+- Quick Fitting: forced OFF
+- Bike: MTB
+- BB floor height: 300 mm
+- Current saddle: 706 mm
+- Crank: 170 mm
+- Purpose: COMMUTE
 
-Result:
-- Result state: `PRO FIT` — PASS
-- `PRO MEASUREMENT` badge visible — PASS
-- `QUICK MEASUREMENT` badge hidden — PASS
-- Professional measurement result: `706 mm` — PASS
-- CURRENT: `700 mm` — PASS
-- CHANGE: `+6 mm` — PASS
+### Expected / verified
+- PRO MEASUREMENT: visible
+- QUICK MEASUREMENT: hidden
+- Result state: PRO FIT
+- Professional measurement result: 706 mm
+- Measurement source: ANALOG
+- Target: 706 mm
 
-### Mode conflict regression
-- Enabling Analog Measurement automatically clears Quick Fitting — PASS
-- Quick Fitting control disabled while Analog Measurement is ON — PASS
-- Turning Analog OFF restores Quick Fitting availability — PASS
-- Quick Fitting with 80.0 cm inseam + COMMUTE returns `703 mm` — PASS
-- Re-entering Analog from Quick clears Quick and restores PRO path — PASS
+## Mode conflict regression
+- Analog OFF + Quick ON -> QUICK FIT only
+- Re-enable Analog -> Quick is automatically unchecked and disabled
+- Recalculate -> PRO FIT only
 
-### UI/runtime
-- 390 px viewport horizontal overflow: 0 — PASS
-- Browser console errors: 0 — PASS
-- Page runtime errors: 0 — PASS
+## Static QA
+- app.js syntax: PASS
+- service-worker.js syntax: PASS
+- manifest JSON: PASS
+- Mobile 390 px horizontal overflow: 0 px
+- Browser runtime/page errors: 0
 
-## Static validation
-- `node --check app.js` — PASS
-- `node --check service-worker.js` — PASS
-- Manifest JSON parse — PASS
-- DOM id/reference validation — PASS
-- ZIP integrity/extraction — PASS
+## Deployment hardening
+- HTML/CSS/JS/Service Worker build query: `1.6.5-pro-ui1`
+- Service Worker cache: `bike-fitting-lab-v1.6.5-pro-ui1`
+- App assets use network-first delivery with cache fallback to reduce stale GitHub Pages / iOS PWA code.
