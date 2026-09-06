@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'bike-fitting-lab-v1.6.0';
+const CACHE_NAME = 'bike-fitting-lab-v1.6.2-qm1';
 const APP_SHELL = [
   './',
   './index.html',

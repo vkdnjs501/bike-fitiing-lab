@@ -1,27 +1,39 @@
-# YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.1
+# YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.2
 
 Field-oriented bicycle saddle-height fitting web app for desktop, iPhone, and iPad.
 
-## Beta 1.6.1
+## Beta 1.6.2 — Quick Measurement Reliability Update
 
-Small bug-fix update for the Quick Fitting workflow.
+This update fixes the Analog + Quick Fitting workflow and adds real-time input diagnostics for field use.
 
-### Changes
-- Fixed Quick Fitting calculate-button/result update issue.
-- Quick Fitting now disables and ignores Crank Length.
-- Quick Fitting skips BB Floor Height, Current Saddle Height, and Crank Length.
-- Analog + Quick workflow can calculate from a valid tape-measured inseam without requiring height.
-- Invalid/missing inseam now produces a visible Result Dashboard message instead of appearing unresponsive.
-- Added asset/service-worker cache-busting for GitHub Pages and iOS Home Screen/PWA updates.
+### Quick workflow
+When **Analog Measurement + Quick Fitting** are enabled, the app calculates without camera/gallery/3-point measurement and without BB floor/current saddle/crank inputs.
 
-### Quick Fitting baseline
-`Target saddle height = inseam × 0.883`
+Required field inputs:
+- Rider height (cm)
+- Manual inseam (cm)
+- Bike type
+- Riding purpose
 
-The main output is measured from **BB center → saddle top**.
+Quick target baseline:
+`inseam(mm) × 0.883 + purpose trim`
+
+Purpose trim used only in Quick Fitting:
+- COMMUTE: -3 mm
+- ENDURANCE: 0 mm
+- SPORT: +3 mm
+
+The main output remains **BB center → saddle top**.
+
+### UX changes
+- QUICK MEASUREMENT badge appears when Analog Measurement or Quick Fitting is enabled.
+- New **USAGE ERROR** panel below REFERENCE shows missing/invalid fields and reasons live in red.
+- Rider symptom check is collapsed by default.
+- Existing full fitting, camera/gallery measurement, result photo export and iOS/PWA support remain available.
 
 ## Deployment
-Upload all files and folders in this package to the GitHub Pages repository root, replacing the previous Beta 1.6.0 files.
+Upload the package contents to the GitHub Pages repository root and replace the previous version files. Upload the `icons/` directory, `manifest.webmanifest`, and `service-worker.js` as well.
 
-Because Beta 1.6.1 changes the Service Worker cache version, reload the page after deployment. On an iOS Home Screen installation, closing and reopening the web app after the first online launch helps the new Service Worker take control immediately.
+The Service Worker cache is bumped to Beta 1.6.2, so the first online launch after deployment refreshes the app shell.
 
 *made by. HyunSeock.Son*

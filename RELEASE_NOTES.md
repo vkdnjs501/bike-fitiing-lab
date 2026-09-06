@@ -1,27 +1,10 @@
-# Bike Fitting Lab — Beta 1.6.1
-## Quick Fitting Bug Fix
+# Bike Fitting Lab — Beta 1.6.2
+## Quick Measurement Reliability & Usage Error Update
 
-A small stability and field-usability update focused on the Quick Fitting workflow.
-
-### Fixed
-- Fixed an issue where the **Quick Fitting calculation button could fail to produce a visible result**.
-- Quick Fitting now validates the tape-measured inseam directly and shows a clear input message in the Result Dashboard when a value is missing or invalid.
-- Analog Measurement no longer requires rider height for Quick Fitting when a valid inseam measurement is already available.
-
-### Improved
-- **Crank Length** is now automatically disabled when Quick Fitting is enabled.
-- Quick Fitting now ignores any crank value saved from a previous full fitting session, preventing hidden crank correction from changing the quick result.
-- Quick Fitting consistently skips **BB Floor Height / Current Saddle / Crank Length**.
-- Added versioned asset loading and Service Worker cache-busting for `app.js`, `style.css`, manifest, and the Service Worker to reduce stale-code issues after GitHub Pages updates.
-
-### Calculation
-Quick Fitting remains based on:
-
-`inseam × 0.883 = BB center → saddle top target`
-
-Example: `800 mm × 0.883 = 706.4 mm → 706 mm`
-
-### Version
-**Beta 1.6.1 — Quick Fitting Bug Fix**
-
-*made by. HyunSeock.Son*
+- Fixed Analog + Quick Fitting workflow so direct height/inseam inputs calculate normally without photo measurement.
+- Quick Fitting now uses rider height + inseam + bike type + riding purpose; BB floor/current saddle/crank remain skipped.
+- Added conservative Quick purpose trim: COMMUTE -3 mm / ENDURANCE 0 mm / SPORT +3 mm.
+- QUICK MEASUREMENT badge appears when Analog Measurement or Quick Fitting is enabled.
+- Added live USAGE ERROR panel under REFERENCE with missing/invalid field and reason in red.
+- Rider symptom check is collapsed by default.
+- Existing full fitting, photo measurement, result export and iOS/PWA features retained.

@@ -4,7 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const dom = {
     height: $('heightCm'), manualInseam: $('manualInseam'), bb: $('bbHeight'), current: $('currentSaddle'), crank: $('crankLength'),
-    analogMode: $('analogMode'), quickFitMode: $('quickFitMode'), photoSection: $('photoSection'), bbField: $('bbField'), currentField: $('currentField'),
+    analogMode: $('analogMode'), quickFitMode: $('quickFitMode'), photoSection: $('photoSection'), bbField: $('bbField'), currentField: $('currentField'), crankField: $('crankField'),
     bikeChoices: $('bikeChoices'), purposeChoices: $('purposeChoices'), symptomGrid: $('symptomGrid'),
     video: $('video'), photoCanvas: $('photoCanvas'), sourceCanvas: $('sourceCanvas'), exportCanvas: $('exportCanvas'),
     cameraStage: $('cameraStage'), stageBadge: $('stageBadge'), measureStatus: $('measureStatus'), qualityPill: $('qualityPill'), qualityText: $('qualityText'),
@@ -14,7 +14,8 @@
     heroCurrent: $('heroCurrent'), heroTarget: $('heroTarget'), heroChange: $('heroChange'), fitGauge: $('fitGauge'), gaugeCurrent: $('gaugeCurrent'), gaugeCaption: $('gaugeCaption'),
     metricInseam: $('metricInseam'), metricSource: $('metricSource'), metricCrank: $('metricCrank'), metricFloor: $('metricFloor'),
     verdictBadge: $('verdictBadge'), verdictText: $('verdictText'), adjustPlan: $('adjustPlan'), fitAnalysis: $('fitAnalysis'), symptomAnalysis: $('symptomAnalysis'), fieldGuide: $('fieldGuide'),
-    quickBadge: $('quickBadge'), quickResultLine: $('quickResultLine'), resultShell: document.querySelector('.result-shell')
+    quickBadge: $('quickBadge'), quickResultLine: $('quickResultLine'), resultShell: document.querySelector('.result-shell'),
+    usageErrorCard: $('usageErrorCard'), usageErrorState: $('usageErrorState'), usageErrorList: $('usageErrorList')
   };
 
   const pctx = dom.photoCanvas.getContext('2d');
@@ -30,16 +31,16 @@
     mtb: { label: 'MTB', ko: '산악자전거', bb: 300 }
   };
   const PURPOSE = {
-    commute: { label: 'COMMUTE', ko: '생활 · 출퇴근', test: '편안한 페달링과 정차 안정감을 함께 확인하세요.' },
-    endurance: { label: 'ENDURANCE', ko: '장거리 · 균형', test: '케이던스를 유지하며 무릎과 골반이 자연스럽게 움직이는지 확인하세요.' },
-    sport: { label: 'SPORT', ko: '운동 · 빠른 주행', test: '높은 케이던스에서도 골반 흔들림과 발끝 과신전이 없는지 확인하세요.' }
+    commute: { label: 'COMMUTE', ko: '생활 · 출퇴근', quickTrim: -3, test: '편안한 페달링과 정차 안정감을 함께 확인하세요.' },
+    endurance: { label: 'ENDURANCE', ko: '장거리 · 균형', quickTrim: 0, test: '케이던스를 유지하며 무릎과 골반이 자연스럽게 움직이는지 확인하세요.' },
+    sport: { label: 'SPORT', ko: '운동 · 빠른 주행', quickTrim: 3, test: '높은 케이던스에서도 골반 흔들림과 발끝 과신전이 없는지 확인하세요.' }
   };
   const POINT_LABELS = ['정수리', '가랑이', '발끝'];
   const BASE_COEFF = 0.883;
   const CRANK_REFERENCE = 170;
   const RANGE_MM = 5;
-  const STORE_KEY = 'bfl_1_6_settings';
-  const LEGACY_KEY = 'bfl_1_5_settings';
+  const STORE_KEY = 'bfl_1_6_2_settings';
+  const LEGACY_KEYS = ['bfl_1_6_1_cm_settings', 'bfl_1_6_1_settings', 'bfl_1_6_settings', 'bfl_1_5_settings'];
 
   const state = {
     stream: null,
@@ -94,7 +95,7 @@
     const secureOrigin = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if (!('serviceWorker' in navigator) || !secureOrigin) return;
     try {
-      await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+      await navigator.serviceWorker.register('./service-worker.js?v=1.6.2-qm1', { scope: './', updateViaCache: 'none' });
     } catch (_) {
       // The core fitting tool remains fully usable if service-worker registration is unavailable.
     }
@@ -109,7 +110,7 @@
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
         height: dom.height.value,
-        manualInseam: dom.manualInseam.value,
+        manualInseamCm: dom.manualInseam.value,
         analogMode: state.analogMode,
         quickFit: state.quickFit,
         bb: dom.bb.value,
@@ -123,11 +124,18 @@
 
   function restoreSettings() {
     try {
-      const raw = localStorage.getItem(STORE_KEY) || localStorage.getItem(LEGACY_KEY);
+      const raw = localStorage.getItem(STORE_KEY) || LEGACY_KEYS.map((key) => localStorage.getItem(key)).find(Boolean);
       if (!raw) { syncChoices(); syncMeasurementModes(); return; }
       const saved = JSON.parse(raw);
       if (saved.height || saved.heightCm) dom.height.value = saved.height || saved.heightCm;
-      if (saved.manualInseam) dom.manualInseam.value = saved.manualInseam;
+      if (saved.manualInseamCm) {
+        dom.manualInseam.value = saved.manualInseamCm;
+      } else if (saved.manualInseam) {
+        // Beta 1.6.1 and earlier stored direct inseam input in millimeters.
+        // Migrate it to the new centimeter UI without changing the internal fitting calculation.
+        const legacyInseam = Number.parseFloat(saved.manualInseam);
+        if (Number.isFinite(legacyInseam)) dom.manualInseam.value = legacyInseam > 110 ? (legacyInseam / 10).toFixed(1) : legacyInseam;
+      }
       state.analogMode = saved.analogMode === true;
       state.quickFit = saved.quickFit === true;
       if (saved.bb || saved.bbHeight) dom.bb.value = saved.bb || saved.bbHeight;
@@ -166,13 +174,16 @@
 
     dom.bb.disabled = state.quickFit;
     dom.current.disabled = state.quickFit;
+    dom.crank.disabled = state.quickFit;
     dom.bbField.classList.toggle('quick-disabled', state.quickFit);
     dom.currentField.classList.toggle('quick-disabled', state.quickFit);
+    dom.crankField.classList.toggle('quick-disabled', state.quickFit);
     dom.resultShell.classList.toggle('quick-mode', state.quickFit);
-    dom.quickBadge.hidden = !state.quickFit;
+    dom.quickBadge.hidden = !(state.analogMode || state.quickFit);
     dom.quickResultLine.hidden = !state.quickFit || !state.result;
     dom.btnCalculate.textContent = state.quickFit ? '간이 피팅값 계산' : '권장 안장 높이 계산';
     updateSaveState();
+    updateUsagePanel();
   }
 
   function syncChoices() {
@@ -184,6 +195,7 @@
   function scheduleRecalc() {
     cancelAnimationFrame(state.recalcFrame);
     state.recalcFrame = requestAnimationFrame(() => {
+      updateUsagePanel();
       if (state.result || num(dom.manualInseam)) calculateFit(false);
       updateSaveState();
     });
@@ -475,10 +487,11 @@
   }
 
   function resolveInseam() {
-    const manual = num(dom.manualInseam);
-    if (manual && manual >= 450 && manual <= 1100) {
-      if (state.analogMode) return { value: manual, source: 'ANALOG', sourceKo: '아날로그 줄자 실측' };
-      return { value: manual, source: 'MANUAL', sourceKo: '직접 입력' };
+    const manualCm = num(dom.manualInseam);
+    if (manualCm && manualCm >= 45 && manualCm <= 110) {
+      const manualMm = manualCm * 10;
+      if (state.analogMode) return { value: manualMm, source: 'ANALOG', sourceKo: '아날로그 줄자 실측' };
+      return { value: manualMm, source: 'MANUAL', sourceKo: '직접 입력' };
     }
     const photo = computePhotoInseam(false);
     if (photo) return { value: photo, source: 'PHOTO', sourceKo: '사진 3점 측정' };
@@ -486,6 +499,8 @@
   }
 
   function crankCorrection() {
+    // Quick Fitting intentionally omits crank input/correction. A value saved from a previous full-fit session must not affect the quick result.
+    if (state.quickFit) return { value: 0, crank: null, applied: false };
     const crank = num(dom.crank);
     if (!crank || crank < 140 || crank > 190) return { value: 0, crank: null, applied: false };
     return { value: CRANK_REFERENCE - crank, crank, applied: true };
@@ -562,36 +577,95 @@
     dom.fieldGuide.innerHTML = `<div><b>01</b><span>5 mm 이하 작은 폭으로 조정</span></div><div><b>02</b><span>10–15분 테스트 라이딩</span></div><div><b>03</b><span>${purpose.test}</span></div>`;
   }
 
-  function calculateFit(scroll = true) {
+  function collectUsageErrors() {
+    const errors = [];
+    const height = num(dom.height);
+    const manualCm = num(dom.manualInseam);
+
     if (state.analogMode) {
-      const height = num(dom.height);
-      const manual = num(dom.manualInseam);
-      if (!height || height < 100 || height > 230 || !manual || manual < 450 || manual > 1100) {
-        state.result = null;
-        dom.resultState.textContent = 'NEED ANALOG';
-        dom.fitAnalysis.textContent = '아날로그 측정에서는 신장(cm)과 줄자로 측정한 인심(mm)을 모두 입력해 주세요.';
-        dom.quickResultLine.hidden = true;
-        return false;
+      if (!height || height < 100 || height > 230) errors.push({ field: '신장', reason: '아날로그 측정에서는 100–230 cm 범위의 신장 직접 입력이 필요합니다.' });
+      if (!manualCm || manualCm < 45 || manualCm > 110) errors.push({ field: '인심 직접입력', reason: '줄자로 잰 인심을 45.0–110.0 cm 범위로 입력해 주세요.' });
+    } else {
+      if (dom.height.value && (!height || height < 100 || height > 230)) {
+        errors.push({ field: '신장', reason: '100–230 cm 범위로 입력해 주세요.' });
+      }
+      if (dom.manualInseam.value && (!manualCm || manualCm < 45 || manualCm > 110)) {
+        errors.push({ field: '인심 직접입력', reason: '45.0–110.0 cm 범위로 입력해 주세요.' });
       }
     }
-    const inseam = resolveInseam();
-    if (!inseam) {
-      state.result = null;
-      dom.resultState.textContent = 'NEED MEASURE';
-      dom.fitAnalysis.textContent = '신장과 3점 사진 측정을 완료하거나 인심을 직접 입력해 주세요.';
-      return false;
+
+    if (!state.analogMode && !manualCm) {
+      if (!state.hasImage || state.points.length !== 3) {
+        errors.push({ field: '인심 측정', reason: '인심을 직접 입력하거나 사진 3점 측정을 완료해 주세요.' });
+      } else if (!height || height < 100 || height > 230) {
+        errors.push({ field: '신장', reason: '사진 3점 측정값 환산에는 신장(cm)이 필요합니다.' });
+      } else if (!computePhotoInseam(false)) {
+        errors.push({ field: '현장 3점 측정', reason: '정수리 → 가랑이 → 발끝 점 위치와 순서를 확인해 주세요.' });
+      }
     }
+
+    if (!BIKE[state.bike]) errors.push({ field: '자전거 타입', reason: '자전거 타입을 선택해 주세요.' });
+    if (!PURPOSE[state.purpose]) errors.push({ field: '주행 목적', reason: 'COMMUTE / ENDURANCE / SPORT 중 하나를 선택해 주세요.' });
+
+    const unique = [];
+    const seen = new Set();
+    for (const item of errors) {
+      const key = `${item.field}|${item.reason}`;
+      if (!seen.has(key)) { seen.add(key); unique.push(item); }
+    }
+    return unique;
+  }
+
+  function updateUsagePanel(errors = collectUsageErrors()) {
+    if (!dom.usageErrorCard || !dom.usageErrorList) return errors;
+    const hasError = errors.length > 0;
+    dom.usageErrorCard.dataset.state = hasError ? 'error' : 'ready';
+    dom.usageErrorState.textContent = hasError ? `${errors.length} ERROR${errors.length > 1 ? 'S' : ''}` : 'READY';
+    dom.usageErrorList.innerHTML = hasError
+      ? errors.map((item) => `<li><strong>${item.field}</strong><span>${item.reason}</span></li>`).join('')
+      : '<li class="usage-ok"><strong>READY</strong><span>현재 선택한 측정 모드에서 계산에 필요한 입력이 준비되었습니다.</span></li>';
+    return errors;
+  }
+
+  function renderInputError(code, message) {
+    state.result = null;
+    dom.resultState.textContent = code;
+    dom.targetSaddle.textContent = '—';
+    dom.heroTarget.textContent = '—';
+    dom.targetRange.textContent = message;
+    dom.fitAnalysis.textContent = message;
+    dom.quickResultLine.hidden = true;
+    dom.quickBadge.hidden = !(state.analogMode || state.quickFit);
+    updateUsagePanel();
+    if (state.quickFit) {
+      dom.verdictBadge.dataset.verdict = 'idle';
+      dom.verdictBadge.textContent = 'INPUT CHECK';
+      dom.verdictText.textContent = message;
+    }
+    return false;
+  }
+
+  function calculateFit(scroll = true) {
+    const usageErrors = updateUsagePanel();
+    if (usageErrors.length) {
+      const first = usageErrors[0];
+      return renderInputError('USAGE ERROR', `${first.field}: ${first.reason}`);
+    }
+
+    const inseam = resolveInseam();
+    if (!inseam) return renderInputError('NEED MEASURE', '인심 측정값을 확인해 주세요.');
 
     const bb = state.quickFit ? null : (num(dom.bb) || 0);
     const current = state.quickFit ? null : num(dom.current);
     const crank = crankCorrection();
     const baseTarget = inseam.value * BASE_COEFF;
-    const target = baseTarget + crank.value;
+    const purposeTrim = state.quickFit ? PURPOSE[state.purpose].quickTrim : 0;
+    const target = baseTarget + crank.value + purposeTrim;
     const floor = bb == null ? null : target + bb;
     const delta = current ? target - current : null;
     const judgement = verdict(target, current);
 
-    state.result = { inseam: inseam.value, source: inseam.source, sourceKo: inseam.sourceKo, target, baseTarget, floor, current, delta, bb, bike: state.bike, purpose: state.purpose, crank, quickFit: state.quickFit, analogMode: state.analogMode };
+    state.result = { inseam: inseam.value, source: inseam.source, sourceKo: inseam.sourceKo, target, baseTarget, floor, current, delta, bb, bike: state.bike, purpose: state.purpose, crank, purposeTrim, quickFit: state.quickFit, analogMode: state.analogMode };
 
     dom.resultState.textContent = state.quickFit ? 'QUICK FIT' : 'CALCULATED';
     dom.targetSaddle.textContent = round(target);
@@ -601,7 +675,7 @@
     dom.heroChange.textContent = state.quickFit ? 'SKIP' : (delta == null ? '—' : signed(delta));
     dom.resultBikeLine.textContent = `${BIKE[state.bike].label} · ${PURPOSE[state.purpose].label}`;
     dom.resultMeta.textContent = state.quickFit
-      ? (crank.applied ? `QUICK · LeMond 0.883 · CRANK ${crank.crank} mm corrected` : 'QUICK · LeMond 0.883 · BB CENTER → SADDLE TOP')
+      ? `QUICK · ${PURPOSE[state.purpose].label} ${signed(purposeTrim)} mm · LeMond 0.883`
       : (crank.applied ? `LeMond 0.883 · CRANK ${crank.crank} mm corrected` : 'LeMond 0.883 · BB CENTER → SADDLE TOP');
     dom.metricInseam.textContent = round(inseam.value);
     dom.metricSource.textContent = inseam.source;
@@ -610,8 +684,8 @@
     if (state.quickFit) {
       dom.verdictBadge.dataset.verdict = 'idle';
       dom.verdictBadge.textContent = 'QUICK FIT';
-      dom.verdictText.textContent = `현재 안장 실측을 생략한 간이 결과입니다. BB 중심 → 안장 상단 ${round(target)} mm를 현장 시작값으로 적용한 뒤 3–5 mm 범위에서 주행감으로 미세 조정하세요.`;
-      dom.adjustPlan.innerHTML = `<span class="orange">간이 측정값 ${round(target)} mm</span><br>현재 안장값이 없어 RAISE / LOWER 단계 계산은 생략합니다. 목표값 부근으로 맞춘 뒤 짧은 테스트 라이딩으로 확인하세요.`;
+      dom.verdictText.textContent = `현재 안장 실측을 생략한 간이 결과입니다. ${PURPOSE[state.purpose].label} 목적 트림 ${signed(purposeTrim)} mm를 반영한 BB 중심 → 안장 상단 ${round(target)} mm를 현장 시작값으로 적용하세요.`;
+      dom.adjustPlan.innerHTML = `<span class="orange">간이 측정값 ${round(target)} mm</span><br>${PURPOSE[state.purpose].label} 목적 보정 ${signed(purposeTrim)} mm 적용. 현재 안장값이 없어 RAISE / LOWER 단계는 생략하며, 목표값 부근에서 짧은 테스트 라이딩으로 확인하세요.`;
     } else {
       dom.verdictBadge.dataset.verdict = judgement.code;
       dom.verdictBadge.textContent = judgement.label;
@@ -620,18 +694,22 @@
     }
     dom.symptomAnalysis.innerHTML = symptomAdvice();
     updateGauge(target, current);
-    dom.quickBadge.hidden = !state.quickFit;
+    dom.quickBadge.hidden = !(state.analogMode || state.quickFit);
     dom.quickResultLine.hidden = !state.quickFit;
     if (state.quickFit) dom.quickResultLine.innerHTML = `간이 측정값: <strong>${round(target)} mm</strong>`;
     updateFieldGuide();
 
-    const crankText = crank.applied
-      ? ` 선택 크랭크 ${crank.crank} mm에 대해 170 mm 기준 대비 <strong>${signed(crank.value)} mm</strong> 보정을 적용했습니다.`
-      : ' 크랭크 길이는 미입력되어 별도 보정을 적용하지 않았습니다.';
+    const crankText = state.quickFit
+      ? ' 간이피팅에서는 크랭크 입력과 보정을 생략합니다.'
+      : (crank.applied
+        ? ` 선택 크랭크 ${crank.crank} mm에 대해 170 mm 기준 대비 <strong>${signed(crank.value)} mm</strong> 보정을 적용했습니다.`
+        : ' 크랭크 길이는 미입력되어 별도 보정을 적용하지 않았습니다.');
     const floorText = floor == null ? ' 간이피팅에서는 BB 지면 높이를 생략해 FLOOR REF.를 계산하지 않습니다.' : ` 지면 참고값은 ${round(floor)} mm입니다.`;
-    const modeText = state.quickFit ? ' <strong>QUICK MEASUREMENT</strong> 모드로 현재 안장과 BB 지면 입력을 생략했습니다.' : '';
-    dom.fitAnalysis.innerHTML = `<strong>${inseam.sourceKo}</strong> 인심 <span class="orange">${round(inseam.value)} mm</span> × 0.883 = 기본 <strong>${round(baseTarget)} mm</strong>.${crankText} 최종 BB 기준 목표는 <span class="orange">${round(target)} mm</span>.${floorText}${modeText}`;
+    const purposeText = state.quickFit ? ` ${PURPOSE[state.purpose].label} 간이 목적 트림 <strong>${signed(purposeTrim)} mm</strong>를 적용했습니다.` : '';
+    const modeText = state.quickFit ? ' <strong>QUICK MEASUREMENT</strong> 모드로 현재 안장·BB 지면·크랭크 입력을 생략했습니다.' : '';
+    dom.fitAnalysis.innerHTML = `<strong>${inseam.sourceKo}</strong> 인심 <span class="orange">${round(inseam.value)} mm</span> × 0.883 = 기본 <strong>${round(baseTarget)} mm</strong>.${crankText}${purposeText} 최종 BB 기준 목표는 <span class="orange">${round(target)} mm</span>.${floorText}${modeText}`;
 
+    updateUsagePanel([]);
     updateSaveState();
     saveSettings();
     if (scroll && window.innerWidth < 861) document.querySelector('.result-shell').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -764,6 +842,7 @@
     if (state.bike === 'minivelo' || state.bike === 'hybrid') state.purpose = 'commute';
     else if (state.bike === 'road' || state.bike === 'gravel') state.purpose = 'endurance';
     syncChoices();
+    updateUsagePanel();
     saveSettings();
     scheduleRecalc();
   });
@@ -825,7 +904,10 @@
   dom.photoCanvas.addEventListener('pointermove', onCanvasPointerMove);
   dom.photoCanvas.addEventListener('pointerup', onCanvasPointerUp);
   dom.photoCanvas.addEventListener('pointercancel', () => { state.dragIndex = -1; });
-  dom.btnCalculate.addEventListener('click', () => calculateFit(true));
+  dom.btnCalculate.addEventListener('click', (event) => {
+    event.preventDefault();
+    calculateFit(true);
+  });
   dom.btnSavePhoto.addEventListener('click', saveResultPhoto);
   dom.btnDismissInstallTip?.addEventListener('click', () => {
     try { localStorage.setItem(IOS_INSTALL_DISMISS_KEY, '1'); } catch (_) {}

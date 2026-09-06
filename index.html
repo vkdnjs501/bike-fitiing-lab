@@ -12,8 +12,8 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="영등포 현장형 자전거 안장 높이 피팅 도구. 아날로그 측정·간이피팅·카메라/갤러리 3점 측정·정비사 대시보드.">
-  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.1</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=1.6.1-cm1">
+  <title>YEONGDEUNGPO BIKE FITTING LAB — Beta 1.6.2</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=1.6.2-qm1">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png">
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon-167.png">
@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
-  <link rel="stylesheet" href="./style.css?v=1.6.1-cm1">
+  <link rel="stylesheet" href="./style.css?v=1.6.2-qm1">
 </head>
 <body>
   <div class="wrap">
@@ -34,7 +34,7 @@
         <h1>안장 높이 피팅기</h1>
         <p>Field fitting · Analog / Photo · Quick Measurement · Current → Target → Change</p>
       </div>
-      <div class="badge" aria-label="Beta version">BETA 1.6.1</div>
+      <div class="badge" aria-label="Beta version">BETA 1.6.2</div>
     </header>
 
     <nav class="flowbar" aria-label="피팅 순서">
@@ -159,10 +159,10 @@
             <button class="choice active" type="button" data-purpose="endurance"><b>ENDURANCE</b><span>장거리 · 균형</span></button>
             <button class="choice" type="button" data-purpose="sport"><b>SPORT</b><span>운동 · 빠른 주행</span></button>
           </div>
-          <p class="hint">주행 목적은 0.883 기본 안장 높이를 임의로 크게 바꾸지 않고, 미세조정 범위와 테스트 안내에 반영합니다.</p>
+          <p class="hint">정밀 피팅은 0.883 기준을 유지합니다. 간이피팅에서는 현장 시작값 구분을 위해 COMMUTE -3 / ENDURANCE 0 / SPORT +3 mm의 소폭 목적 트림을 적용합니다.</p>
         </section>
 
-        <details class="section advanced" open>
+        <details class="section advanced" id="riderCheckDetails">
           <summary>RIDER CHECK / 라이딩 증상 체크</summary>
           <div class="advanced-body symptom-grid" id="symptomGrid">
             <label><input type="checkbox" value="hip-rock"><span>골반이 좌우로 흔들림</span></label>
@@ -270,20 +270,29 @@
             <p><strong>기본값</strong>은 인심 × 0.883의 LeMond 방식이며 BB 중심에서 안장 상단까지를 측정합니다.</p>
             <p><strong>크랭크 보정</strong>은 입력한 경우 170 mm를 중립 기준으로 페달 최하점 도달거리 차이를 같은 mm만큼 반대로 보정하는 현장 참고값입니다.</p>
             <p><strong>사진 측정</strong>은 사진 속 정수리–발끝 길이를 입력 신장으로 환산한 뒤 가랑이–발끝 비율을 적용합니다. 원근·자세에 따라 오차가 생길 수 있어 줄자 실측이 우선입니다.</p>
+            <p><strong>Quick 목적 트림</strong>은 간이피팅에서만 COMMUTE -3 mm / ENDURANCE 0 mm / SPORT +3 mm를 적용하며, 정밀 피팅 계산에는 적용하지 않습니다.</p>
             <p class="warning">※ 본 도구는 현장 피팅 시작점을 위한 참고 도구입니다. 통증을 진단하지 않으며, 지속되는 통증은 안장 높이 하나로 원인을 단정하지 마세요.</p>
+          </div>
+        </section>
+
+        <section class="card usage-error-card" id="usageErrorCard" data-state="error" aria-live="polite">
+          <div class="head"><h2>USAGE ERROR / 입력 확인</h2><span class="kicker" id="usageErrorState">CHECK</span></div>
+          <div class="section usage-error-body">
+            <p class="usage-error-lead">계산에 필요한 공란이나 잘못된 입력을 실시간으로 표시합니다.</p>
+            <ul id="usageErrorList" class="usage-error-list"></ul>
           </div>
         </section>
       </section>
     </main>
 
     <footer class="footer">
-      <div>BETA 1.6.1 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
-      <div>Quick mode skips BB floor/current saddle/crank inputs · Calculation base: LeMond 0.883</div>
+      <div>BETA 1.6.2 · iOS Home Screen Icon · Safari/PWA Optimization · Field Mechanic Dashboard</div>
+      <div>Quick mode: Analog/Quick workflow validation · Purpose trim ±3 mm · Calculation base: LeMond 0.883</div>
     </footer>
   </div>
 
   <canvas id="sourceCanvas" class="visually-hidden"></canvas>
   <canvas id="exportCanvas" class="visually-hidden"></canvas>
-  <script src="./app.js?v=1.6.1-cm1"></script>
+  <script src="./app.js?v=1.6.2-qm1"></script>
 </body>
 </html>
