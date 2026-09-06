@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="자전거 피팅기">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#07080a">
+<meta name="description" content="카메라 3점 터치로 인심(다리 길이)을 측정하고, 라이딩 자세별 추천 안장 높이(mm)를 계산하는 웹앱">
+<title>자전거 피팅기 — BIKE FITTING LAB</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307080a'/%3E%3Ccircle cx='30' cy='70' r='16' fill='none' stroke='%23FF6A1A' stroke-width='7'/%3E%3Ccircle cx='75' cy='70' r='16' fill='none' stroke='%23FF6A1A' stroke-width='7'/%3E%3Cpath d='M30 70 L52 32 L75 70 M52 32 L40 70 M52 32 L62 45' stroke='%23FF6A1A' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2307080a'/%3E%3Ccircle cx='30' cy='70' r='16' fill='none' stroke='%23FF6A1A' stroke-width='7'/%3E%3Ccircle cx='75' cy='70' r='16' fill='none' stroke='%23FF6A1A' stroke-width='7'/%3E%3Cpath d='M30 70 L52 32 L75 70 M52 32 L40 70 M52 32 L62 45' stroke='%23FF6A1A' stroke-width='7' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-kr">자전거 피팅기</span>
+      <span class="brand-en">BIKE FITTING LAB</span>
+    </div>
+    <div class="badge">BETA 1.0.0</div>
+  </header>
+  <p class="tagline">카메라 3점 터치 측정 · 인심(다리길이) 계산 · 자세별 안장 높이 추천</p>
+
+  <!-- ================= 01 MEASURE ================= -->
+  <section class="panel" id="panel-measure">
+    <div class="panel-head">
+      <span class="step-tag">01</span>
+      <h2>MEASURE <small>· 신체 측정</small></h2>
+    </div>
+
+    <div class="field-group">
+      <label for="heightCm">신장(키) <em>· cm</em></label>
+      <input type="number" id="heightCm" inputmode="decimal" placeholder="예: 175" min="80" max="230">
+      <p class="hint">촬영한 사진의 픽셀 거리를 실제 길이(mm)로 환산하는 축척 기준값입니다.</p>
+    </div>
+
+    <div class="camera-wrap" id="cameraWrap">
+      <video id="video" playsinline autoplay muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="ready-badge" id="readyBadge">READY</div>
+      <div class="camera-empty" id="cameraEmpty">
+        <p>카메라를 켜고 전신이 보이도록 촬영하세요</p>
+        <p class="sub">정면 또는 측면 · 신발을 벗고 벽에 등을 붙인 자세 권장</p>
+      </div>
+    </div>
+
+    <p class="step-hint" id="stepHint">카메라를 켜주세요</p>
+
+    <div class="camera-controls">
+      <button id="btnStartCamera" class="btn btn-primary">카메라 켜기</button>
+      <button id="btnSwitchCamera" class="btn btn-ghost" disabled>전/후면 전환</button>
+      <button id="btnCapture" class="btn btn-accent" disabled>촬영</button>
+      <button id="btnRetake" class="btn btn-ghost" disabled>다시 찍기</button>
+      <button id="btnUndoPoint" class="btn btn-ghost" disabled>마지막 점 취소</button>
+    </div>
+
+    <ol class="tap-steps" id="tapSteps">
+      <li data-idx="0"><span class="dot">1</span>정수리 <small>머리 위</small></li>
+      <li data-idx="1"><span class="dot">2</span>가랑이 <small>사타구니</small></li>
+      <li data-idx="2"><span class="dot">3</span>발끝 <small>바닥 기준</small></li>
+    </ol>
+
+    <div class="manual-toggle">
+      <button id="btnManualMode" class="link-btn">카메라 대신 인심(다리길이) 직접 입력 →</button>
+    </div>
+    <div class="field-group hidden" id="manualInseamGroup">
+      <label for="manualInseam">인심 길이 직접 입력 <em>· mm</em></label>
+      <input type="number" id="manualInseam" inputmode="decimal" placeholder="예: 810">
+      <p class="hint">맨발로 벽에 등을 대고 책을 사타구니에 밀착시킨 뒤, 바닥부터 책 윗면까지 잰 길이입니다.</p>
+    </div>
+  </section>
+
+  <!-- ================= 02 SETUP ================= -->
+  <section class="panel" id="panel-setup">
+    <div class="panel-head">
+      <span class="step-tag">02</span>
+      <h2>SETUP <small>· 자전거 조건</small></h2>
+    </div>
+
+    <div class="field-group">
+      <label>바텀브라켓(BB) 높이 <em>지면 → 크랭크 중심</em></label>
+      <div class="pill-row" id="bbPresets">
+        <button class="pill" data-bb="260">하이브리드/시티<span>260</span></button>
+        <button class="pill active" data-bb="270">로드<span>270</span></button>
+        <button class="pill" data-bb="280">그래블<span>280</span></button>
+        <button class="pill" data-bb="300">MTB<span>300</span></button>
+      </div>
+      <input type="number" id="bbHeight" inputmode="decimal" value="270">
+      <p class="hint">보유 자전거의 실측값을 입력하면 더 정확합니다. mm 단위.</p>
+    </div>
+  </section>
+
+  <!-- ================= 03 RESULT ================= -->
+  <section class="panel" id="panel-result">
+    <div class="panel-head">
+      <span class="step-tag">03</span>
+      <h2>RESULT <small>· 추천 안장 높이</small></h2>
+    </div>
+
+    <p class="result-sub" id="inseamReadout">인심 측정 대기 중</p>
+
+    <div class="result-grid">
+      <div class="result-card" data-posture="upright">
+        <h3>세운 자세<span>Upright</span></h3>
+        <div class="big-num"><span id="valUpright">—</span><small>mm</small></div>
+        <p class="formula">인심 × 0.860 + BB높이</p>
+      </div>
+      <div class="result-card featured" data-posture="slight">
+        <h3>살짝 숙인 자세<span>Endurance</span></h3>
+        <div class="big-num"><span id="valSlight">—</span><small>mm</small></div>
+        <p class="formula">인심 × 0.883 + BB높이</p>
+      </div>
+      <div class="result-card" data-posture="aggressive">
+        <h3>매우 숙인 자세<span>Aggressive</span></h3>
+        <div class="big-num"><span id="valAggr">—</span><small>mm</small></div>
+        <p class="formula">인심 × 0.900 + BB높이</p>
+      </div>
+    </div>
+
+    <button id="btnReset" class="btn btn-ghost full">초기화</button>
+
+    <footer class="reference">
+      <p><strong>계산 원칙</strong> — 정수리·가랑이·발끝 3점의 픽셀 거리를 신장(cm) 기준으로 환산 → 가랑이-발끝 거리(인심) 산출 → 자세별 근사 계수(LeMond/Hamley 계열) 적용 → BB 높이 합산 → 지면 기준 안장 높이.</p>
+      <p>※ 본 계산기는 참고용 근사치입니다. 크랭크 길이, 클릿 위치, 골반 유연성에 따라 실제 최적값은 달라질 수 있으니 ±5mm 범위에서 미세 조정 후 라이딩하며 확인하세요. 전문 피팅샵의 정밀 피팅을 대체하지 않습니다.</p>
+    </footer>
+  </section>
+
+  <p class="footer-credit">made for. iPad 13" · iPhone 17 Pro · Safari</p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
