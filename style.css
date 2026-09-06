@@ -71,3 +71,8 @@ html.standalone .topbar{padding-top:8px}
 .pro-result-line{display:inline-block;margin-top:10px;padding:7px 10px;color:#d9e2e6;background:rgba(255,107,0,.045);border:1px solid rgba(255,176,111,.3);border-radius:999px;font-size:9px}.pro-result-line strong{color:#ffc08b;font-weight:950}.result-shell.professional-mode .mechanic-verdict{background:linear-gradient(90deg,rgba(255,107,0,.055),transparent)}
 .usage-error-card>summary{cursor:pointer;list-style:none}.usage-error-card>summary::-webkit-details-marker{display:none}.usage-error-summary::after{content:"＋";margin-left:auto;color:var(--accent);font-size:15px;font-weight:700;line-height:1}.usage-error-card[open] .usage-error-summary::after{content:"—"}.usage-error-card:not([open]){padding-bottom:0}.usage-error-card:not([open]) .usage-error-summary{border-bottom:0}.usage-error-summary h2{margin-right:auto}.usage-error-summary .kicker{margin-left:10px}
 @media(max-width:560px){.pro-badge{white-space:normal;text-align:center;line-height:1.25}.usage-error-summary::after{font-size:13px}}
+
+/* Beta 1.6.4 — Analog numeric measurements take priority as PRO */
+.mode-switch.is-disabled{opacity:.48;cursor:not-allowed;filter:saturate(.65)}
+.mode-switch.is-disabled .switch-copy small{color:#536671}
+.mode-switch.is-disabled .switch-ui{background:#111e26;border-color:#263944}
